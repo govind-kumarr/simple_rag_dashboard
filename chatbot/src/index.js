@@ -1,4 +1,4 @@
-import { attachChatBotToBody } from "./Chatbot";
+import { attachChatBotToBody } from "./Chatbot.js";
 function afterChatInitialized() {
   const chatContainer = document.querySelector(".chatbot_container_1b9d6bcd");
   const chatBody = document.querySelector(".chatbot_body_1b9d6bcd");
@@ -430,7 +430,11 @@ function afterChatInitialized() {
   }
 }
 
-const { chatbotContainer, openButton } = attachChatBotToBody();
-document.body.appendChild(chatbotContainer);
-document.body.appendChild(openButton);
-afterChatInitialized();
+export function initializeChat(baseUrl){
+  console.log({baseUrl})
+  const { chatbotContainer, openButton } = attachChatBotToBody();
+  document.body.appendChild(chatbotContainer);
+  document.body.appendChild(openButton);
+  afterChatInitialized();
+}
+
