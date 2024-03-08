@@ -53,32 +53,7 @@ passport.deserializeUser(function (user, done) {
   done(null, user);
 });
 
-app.post("/auth/login", passport.authenticate("local"), async (req, res) => {
-  if (req.user) {
-    const sid = uniqueId();
-    const session = await SessionModel.create({ sid, user: req.user });
-    res.cookie("sid", sid, { maxAge: 900000, httpOnly: true });
-    res.send({
-      details: "Login Success!",
-    });
-  }
-});
 
-app.post("/logout", async (req, res) => {
-  res.clearCookie("sid");
-  res.send({
-    details: "Logout Success!",
-  });
-});
-
-app.post("/auth/register", async (req, res) => {
-  const { username, password } = req.body;
-  if (!username || !password)
-    return res.json({ details: "username or password is missing!" });
-
-  await UserModel.create({ username, password });
-  res.json({ details: "Registered Successfully!" });
-});
 
 const verifySesssion = async (req, res, next) => {
   const sid = req.cookies.sid;
