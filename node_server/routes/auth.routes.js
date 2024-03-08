@@ -1,10 +1,10 @@
-const { Router } = require("express");
-const {
+import { Router } from "express";
+import {
   loginController,
   logoutController,
   registerController,
-} = require("../controller/auth.controller");
-const passport = require("passport");
+} from "../controller/auth.controller.js";
+import passport from "passport";
 
 const router = Router();
 
@@ -14,4 +14,4 @@ router.post("/logout", logoutController);
 
 router.post("/auth/register", registerController);
 
-module.exports = router;
+export default router;

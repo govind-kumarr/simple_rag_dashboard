@@ -1,7 +1,7 @@
-const config = require("config");
-const { default: mongoose } = require("mongoose");
+import config from "config";
+import mongoose from "mongoose";
 
-const connectToDb = async (cb) => {
+export const connectToDb = async (cb) => {
   try {
     const mongo_url = config.get("dbConfig.mongo_url");
     await mongoose.connect(`${mongo_url}`);
@@ -13,6 +13,3 @@ const connectToDb = async (cb) => {
   }
 };
 
-module.exports = {
-  connectToDb,
-};

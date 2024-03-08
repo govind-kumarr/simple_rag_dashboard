@@ -1,4 +1,4 @@
-const { default: mongoose } = require("mongoose");
+import mongoose from "mongoose";
 
 const fileMetadataSchema = mongoose.Schema({
   fileName: {
@@ -24,8 +24,7 @@ const fileMetadataSchema = mongoose.Schema({
   },
 });
 
-const FileMetadata = mongoose.model("files_metadata", fileMetadataSchema);
-
-module.exports = {
-  FileMetadata,
-};
+export const FileMetadata = mongoose.model(
+  "files_metadata",
+  fileMetadataSchema
+);

@@ -1,15 +1,12 @@
-const express = require("express");
-const cors = require("cors");
-const config = require("config");
-const session = require("express-session");
-const passport = require("passport");
-const LocalStrategy = require("passport-local");
-const cookieParser = require("cookie-parser");
-const { v4: uniqueId } = require("uuid");
+import express from "express";
+import cors from "cors";
+import config from "config";
+import session from "express-session";
+import cookieParser from "cookie-parser";
 
-const { connectToDb } = require("./db/db");
-const { UserModel } = require("./models/User.model");
-const { SessionModel } = require("./models/Session.model");
+import { connectToDb } from "./db/db.js";
+import { verifySesssion } from "./middlewares/auth.middleware.js";
+import { initPassport } from "./controller/initPassport.js";
 
 const app = express();
 const PORT = config.get("Env.PORT") || 3000;
@@ -25,47 +22,9 @@ app.use(
   })
 );
 app.use(cookieParser());
-
 app.use(express.json());
+initPassport()
 
-passport.use(
-  new LocalStrategy(async function (username, password, done) {
-    try {
-      const user = await UserModel.findOne({ username: username });
-      if (!user) {
-        return done(null, false);
-      }
-      if (user.password === password) return done(null, { username });
-
-      return done(null, false);
-    } catch (error) {
-      done(error);
-    }
-  })
-);
-
-passport.serializeUser(function (user, done) {
-  done(null, user);
-});
-
-passport.deserializeUser(function (user, done) {
-  console.log("user inside deserialized", user);
-  done(null, user);
-});
-
-
-
-const verifySesssion = async (req, res, next) => {
-  const sid = req.cookies.sid;
-  const session = await SessionModel.findOne({ sid });
-
-  if (session) {
-    req.user = session.user;
-    next();
-  }
-
-  return res.status(401).send();
-};
 
 app.get("/api/v1", verifySesssion, (req, res) => {
   console.log(req.user);
