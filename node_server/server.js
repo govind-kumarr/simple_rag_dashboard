@@ -7,6 +7,7 @@ import cookieParser from "cookie-parser";
 import { connectToDb } from "./db/db.js";
 import { verifySesssion } from "./middlewares/auth.middleware.js";
 import { initPassport } from "./controller/initPassport.js";
+import authRoute from "./routes/auth.routes.js";
 
 const app = express();
 const PORT = config.get("Env.PORT") || 3000;
@@ -23,11 +24,12 @@ app.use(
 );
 app.use(cookieParser());
 app.use(express.json());
-initPassport()
+initPassport();
 
+app.use(authRoute);
 
 app.get("/api/v1", verifySesssion, (req, res) => {
-  console.log(req.user);
+  console.log(req.user, "userDetails");
   res.send("App is available!");
 });
 

@@ -1,5 +1,5 @@
-import { SessionModel } from "../models/Session.model";
-import { UserModel } from "../models/User.model";
+import { SessionModel } from "../models/Session.model.js";
+import { UserModel } from "../models/User.model.js";
 import { v4 as uuid } from "uuid";
 
 export const loginController = async (req, res) => {
