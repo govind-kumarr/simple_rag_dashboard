@@ -11,6 +11,7 @@ export const loginController = async (req, res) => {
       details: "Login Success!",
     });
   }
+  console.log("no user found");
 };
 
 export const logoutController = async (req, res) => {
