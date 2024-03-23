@@ -5,6 +5,11 @@ const fileMetadataSchema = mongoose.Schema({
     type: String,
     required: true,
   },
+  fileKey: {
+    type: String,
+    required: true,
+    unique: true,
+  },
   size: {
     type: Number,
     required: true,
@@ -15,12 +20,15 @@ const fileMetadataSchema = mongoose.Schema({
     default: new Date().toString(),
   },
   owner: {
+    type: mongoose.Types.ObjectId,
+    ref: "users",
+  },
+  description: {
     type: String,
   },
-  path: {
-    type: String,
-    required: true,
-    unique: true,
+  uploadStatus: {
+    type: Boolean,
+    default: false,
   },
 });
 

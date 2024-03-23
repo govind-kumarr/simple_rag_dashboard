@@ -8,6 +8,7 @@ import { connectToDb } from "./db/db.js";
 import { verifySesssion } from "./middlewares/auth.middleware.js";
 import { initPassport } from "./controller/initPassport.js";
 import authRoute from "./routes/auth.routes.js";
+import fileRoutes from "./routes/file.routes.js";
 
 const app = express();
 const PORT = config.get("Env.PORT") || 3000;
@@ -27,6 +28,7 @@ app.use(express.json());
 initPassport();
 
 app.use(authRoute);
+app.use("/api/v1", verifySesssion, fileRoutes);
 
 app.get("/api/v1", verifySesssion, (req, res) => {
   console.log(req.user, "userDetails");

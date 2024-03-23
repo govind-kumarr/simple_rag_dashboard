@@ -10,7 +10,8 @@ export const initPassport = async () => {
         if (!user) {
           return done(null, false);
         }
-        if (user.password === password) return done(null, { username });
+        if (user.password === password)
+          return done(null, { username, userId: user._id });
 
         return done(null, false);
       } catch (error) {
