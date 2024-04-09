@@ -10,6 +10,10 @@ const fileMetadataSchema = mongoose.Schema({
     required: true,
     unique: true,
   },
+  type: {
+    type: String,
+    required: true,
+  },
   size: {
     type: Number,
     required: true,

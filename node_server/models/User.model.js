@@ -2,12 +2,13 @@ import mongoose from "mongoose";
 
 const UserSchema = mongoose.Schema({
   username: {
-    type: "String",
+    type: String,
     unique: true,
   },
   password: {
-    type: "String",
+    type: String,
   },
+  chats: [{ type: mongoose.Types.ObjectId, ref: "chats" }],
 });
 
 export const UserModel = mongoose.model("users", UserSchema);

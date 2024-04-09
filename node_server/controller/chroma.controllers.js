@@ -45,9 +45,6 @@ export const addDocsToChroma = async (collectionName, docs) => {
     {
       collectionName,
       url: chromaUrl,
-      collectionMetadata: {
-        "hnsw:space": "cosine",
-      },
     }
   );
 };
@@ -56,6 +53,7 @@ export const getVectorStore = async (collectionName) => {
   return await Chroma.fromExistingCollection(
     new OpenAIEmbeddings({ openAIApiKey }),
     {
+      url: chromaUrl,
       collectionName,
     }
   );

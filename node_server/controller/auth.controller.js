@@ -3,15 +3,14 @@ import { UserModel } from "../models/User.model.js";
 import { v4 as uuid } from "uuid";
 
 export const loginController = async (req, res) => {
-  if (req.user) {
-    const sid = uuid();
-    const session = await SessionModel.create({ sid, user: req.user });
-    res.cookie("sid", sid, { maxAge: 900000, httpOnly: true });
-    res.send({
-      details: "Login Success!",
-    });
-  }
-  console.log("no user found");
+  const { username, password } = req.body;
+  const user = await UserModel.findOne({ username, password });
+  if (!user) return res.json({ details: "Invalid Credentials!" });
+
+  const sid = uuid();
+  await SessionModel.create({ sid, user: user._id });
+  res.cookie("sid", sid, { httpOnly: true });
+  res.json({ details: "Login Success!" });
 };
 
 export const logoutController = async (req, res) => {
@@ -21,6 +20,14 @@ export const logoutController = async (req, res) => {
   });
 };
 
+const createChat = (user) => {
+  return {
+    id: user._id,
+    name: user.username,
+    avatar: user.avatar,
+  };
+}
+
 export const registerController = async (req, res) => {
   const { username, password } = req.body;
   if (!username || !password)
@@ -28,4 +35,11 @@ export const registerController = async (req, res) => {
 
   await UserModel.create({ username, password });
   res.json({ details: "Registered Successfully!" });
+};
+
+export const verifyUserName = async (req, res) => {
+  const { username } = req.body;
+  const user = await UserModel.findOne({ username });
+  if (user) return res.json({ details: "Username already exists!" });
+  res.json({ details: "Username is available!" });
 };

@@ -1,8 +1,11 @@
 import React from "react";
 import SidebarItem from "./SidebarItem";
 import { sidebarItems } from "../assets/sidebarItems";
+import { useLocation } from "react-router-dom";
 
 const Sidebar = () => {
+  const location = useLocation();
+  console.log(location);
   return (
     <aside
       id="logo-sidebar"
@@ -12,7 +15,7 @@ const Sidebar = () => {
       <div className="h-full px-3 pb-4 overflow-y-auto bg-white dark:bg-gray-800">
         <ul className="space-y-2 font-medium">
           {sidebarItems.map((item, index) => (
-            <SidebarItem key={index} {...item} />
+            <SidebarItem key={index} {...item} cur_tab={location.pathname} />
           ))}
         </ul>
       </div>

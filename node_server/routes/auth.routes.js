@@ -8,7 +8,7 @@ import passport from "passport";
 
 const router = Router();
 
-router.post("/auth/login", passport.authenticate("local"), loginController);
+router.post("/auth/login", loginController);
 
 router.post("/logout", logoutController);
 
