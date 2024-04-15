@@ -1,14 +1,15 @@
 import { OpenAI } from "@langchain/openai";
 import { RetrievalQAChain } from "langchain/chains";
 import { ChromaClient } from "chromadb";
-
-import config from "config";
+import { config } from "dotenv";
 import { getVectorStore } from "./chroma.controllers.js";
 
-const chromaUrl = config.get("chroma.url");
-const openAIApiKey = config.get("chroma.openai_api_key");
+config();
+
+const chromaUrl = process.env.CHROMA_URL;
+const openAIApiKey = process.env.OPENAI_API_KEY;
 const client = new ChromaClient({ path: chromaUrl });
-console.log({ chromaUrl });
+
 export class QA_Manager {
   constructor(collectionName) {
     this.model = new OpenAI({

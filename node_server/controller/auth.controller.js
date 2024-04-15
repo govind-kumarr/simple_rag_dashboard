@@ -3,6 +3,11 @@ import { UserModel } from "../models/User.model.js";
 import { v4 as uuid } from "uuid";
 import { createHash, isValidPassword } from "../utils/authUtils.js";
 import { ChatModel } from "../models/Chat.model.js";
+import { config } from "dotenv";
+
+config();
+
+const NOD_ENV = process.env.NODE_ENV;
 
 export const loginController = async (req, res) => {
   const { username, password } = req.body;
@@ -15,7 +20,7 @@ export const loginController = async (req, res) => {
 
   const sid = uuid();
   await SessionModel.create({ sid, user: user._id });
-  res.cookie("sid", sid, { httpOnly: true });
+  res.cookie("sid", sid, { httpOnly: true, secure: NOD_ENV === "PROD" });
   res.json({ details: "Login Success!" });
 };
 

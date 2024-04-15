@@ -1,10 +1,12 @@
 import { ChromaClient, OpenAIEmbeddingFunction } from "chromadb";
 import { Chroma } from "@langchain/community/vectorstores/chroma";
 import { OpenAIEmbeddings } from "@langchain/openai";
-import config from "config";
+import { config } from "dotenv";
 
-const chromaUrl = config.get("chroma.url");
-const openAIApiKey = config.get("chroma.openai_api_key");
+config();
+
+const chromaUrl = process.env.CHROMA_URL;
+const openAIApiKey = process.env.OPENAI_API_KEY;
 const client = new ChromaClient({ path: chromaUrl });
 
 export const getAllCollections = async () => {

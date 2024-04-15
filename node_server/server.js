@@ -1,23 +1,25 @@
 import express from "express";
 import cors from "cors";
-import config from "config";
 import cookieParser from "cookie-parser";
+import { config } from "dotenv";
 
 import { connectToDb } from "./db/db.js";
 import { verifySesssion } from "./middlewares/auth.middleware.js";
-import { initPassport } from "./controller/initPassport.js";
 import authRoute from "./routes/auth.routes.js";
 import fileRoutes from "./routes/file.routes.js";
 import qaRoutes from "./routes/qa.routes.js";
 import chatRoutes from "./routes/chat.routes.js";
 import { UserModel } from "./models/User.model.js";
 
+config();
+
 const app = express();
-const PORT = config.get("Env.PORT") || 3000;
+const PORT = process.env.PORT || 3000;
+const origin = process.env.ORIGIN;
 
 app.use(
   cors({
-    origin: ["http://localhost:5173"],
+    origin: [origin],
     credentials: true,
   })
 );
