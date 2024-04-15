@@ -1,7 +1,7 @@
 import axios from "axios";
 import React, { useState } from "react";
-import { baseUrl } from "../App";
 import FIlecard from "./FIlecard";
+import { instance } from "../config/axios_config";
 
 const Upload = () => {
   const [files, setFiles] = useState([]);
@@ -43,9 +43,7 @@ const Upload = () => {
   };
 
   async function uploadFiles(formdata) {
-    return axios.post(`${baseUrl}/api/v1/file/upload`, formdata, {
-      withCredentials: true,
-    });
+    return instance.post(`/api/v1/file/upload`, formdata);
   }
 
   return (

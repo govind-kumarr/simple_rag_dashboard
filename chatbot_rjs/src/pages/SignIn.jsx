@@ -1,7 +1,7 @@
 import axios from "axios";
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { baseUrl } from "../App";
+import { instance } from "../config/axios_config";
 
 const SignIn = () => {
   const initialInputs = {
@@ -15,7 +15,7 @@ const SignIn = () => {
   const callLoginAPI = async (loginData) => {
     try {
       console.log("login api call", loginData);
-      const res = await axios.post(`${baseUrl}/auth/login`, loginData, {
+      const res = await instance.post(`/auth/login`, loginData, {
         withCredentials: true,
       });
       const data = res.data;

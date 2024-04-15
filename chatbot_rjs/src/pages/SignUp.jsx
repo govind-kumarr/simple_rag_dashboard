@@ -1,7 +1,6 @@
-import axios from "axios";
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { baseUrl } from "../App";
+import { instance } from "../config/axios_config";
 
 const SignUp = () => {
   const initialInputs = {
@@ -16,7 +15,7 @@ const SignUp = () => {
 
   const callRegisterAPI = async (registerData) => {
     try {
-      const res = await axios.post(`${baseUrl}/auth/register`, registerData);
+      const res = await instance.post(`/auth/register`, registerData);
       const data = res.data;
       if (data.details === "Registered Successfully!") {
         navigate("/signin");
