@@ -3,9 +3,9 @@ import { ToastContainer } from "react-toastify";
 import "./App.css";
 import AllRoutes from "./routes/AllRoutes";
 import "react-toastify/dist/ReactToastify.css";
+import React from "react";
 
 function App() {
-  console.log(import.meta.env);
   return (
     <>
       <BrowserRouter>
