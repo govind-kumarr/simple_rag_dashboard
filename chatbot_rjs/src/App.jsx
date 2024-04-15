@@ -5,12 +5,13 @@ import AllRoutes from "./routes/AllRoutes";
 import "react-toastify/dist/ReactToastify.css";
 
 function App() {
+  console.log(import.meta.env);
   return (
     <>
       <BrowserRouter>
         <AllRoutes />
         <ToastContainer
-          position='top-right'
+          position="top-right"
           autoClose={2000}
           hideProgressBar={false}
           newestOnTop={false}
@@ -19,7 +20,7 @@ function App() {
           pauseOnFocusLoss
           draggable
           pauseOnHover
-          theme='light'
+          theme="light"
         />
       </BrowserRouter>
     </>
