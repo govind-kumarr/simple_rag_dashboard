@@ -1,6 +1,8 @@
 import { Router } from "express";
 import { QA_Manager } from "../controller/qa.controller.js";
 import { UserModel } from "../models/User.model.js";
+import { MessageModel } from "../models/Message.model.js";
+import { ChatModel } from "../models/Chat.model.js";
 
 const router = Router();
 
@@ -22,17 +24,42 @@ const getUserInfo = async (req, res, next) => {
   next();
 };
 
-const addUserQuestion = async (question, userId) => {
+const createAIMessage = async (answer) => {
+  const message = {
+    sender: "ai",
+    content: answer["text"],
+  };
+  const newMessage = await MessageModel.create(message);
+  return newMessage;
+};
+
+const createUserMessage = async (question, userId) => {
   const message = {
     sender: userId,
-    message: question,
+    content: question,
   };
+  const newMessage = await MessageModel.create(message);
+  return newMessage;
+};
+
+const saveMessageToChat = async (chatId, message) => {
+  try {
+    const chat = await ChatModel.findById(chatId);
+    chat.messages.push(message._id);
+    await chat.save();
+    return chat;
+  } catch (error) {
+    console.log("Error while saving message", error);
+  }
 };
 
 router.post("/ask", getUserInfo, async (req, res) => {
-  const { question } = req.body;
-  console.log(qa_manager.collectionName);
+  const { question, chatId } = req.body;
+  const newMessage = await createUserMessage(question, req.user.id);
+  await saveMessageToChat(chatId, newMessage);
   const answer = await qa_manager.invokeChain(question);
+  const answerMessage = await createAIMessage(answer);
+  await saveMessageToChat(chatId, answerMessage);
   res.send(answer);
 });
 

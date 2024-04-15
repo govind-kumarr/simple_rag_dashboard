@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { instance } from "../config/axios_config";
 
 const Chat_Message = (props) => {
@@ -59,12 +59,13 @@ const UserInput = ({ addUserMessage }) => {
   );
 };
 
-const Chat = () => {
+const Chat = ({ chat }) => {
+  console.log({ chat });
   const senders = {
     user: "USER",
     ai: "AI",
   };
-  const [messages, setMessages] = useState([]);
+  const [messages, setMessages] = useState(chat?.messages);
 
   const prepareUserMessage = (message) => {
     return {
@@ -84,7 +85,9 @@ const Chat = () => {
 
   async function getAnswer(question) {
     try {
-      const { data } = await instance.post("/api/v1/ask", { question });
+      const chatId = chat._id;
+      console.log({ chatId });
+      const { data } = await instance.post("/api/v1/ask", { question, chatId });
       const { text } = data;
       const newMessage = prepareAiMessage(text);
       setMessages((prevMessages) => [...prevMessages, newMessage]);
@@ -98,10 +101,15 @@ const Chat = () => {
     setMessages((prevMessages) => [...prevMessages, newMessage]);
     getAnswer(message);
   };
+
+  useEffect(() => {
+    setMessages(chat?.messages);
+  }, [chat]);
   return (
     <div className="h-[calc(100vh-7.5rem)] flex flex-col">
       <div className="flex-grow overflow-auto flex flex-col gap-1 mb-4 pr-2">
-        {messages.length > 0 &&
+        {messages &&
+          messages.length > 0 &&
           messages.map((message, index) => (
             <Chat_Message key={index} {...message} />
           ))}

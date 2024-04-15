@@ -7,6 +7,8 @@ import { instance } from "../config/axios_config";
 import { useEffect, useState } from "react";
 import Files_List from "../pages/Files_List";
 import Chat_Page from "../pages/Chat_Page";
+import MyProfile from "../pages/MyProfile";
+import { toast } from "react-toastify";
 
 function ProtectedRoute({ children }) {
   const [loading, setLoading] = useState(true);
@@ -15,6 +17,7 @@ function ProtectedRoute({ children }) {
   const getAuthStatus = async () => {
     try {
       const res = await instance.get("/authenticated");
+      if (res.status >= 500) toast("We will be back soon!");
       setIsAuth(true);
       setLoading(false);
     } catch (error) {
@@ -49,9 +52,37 @@ function Logout() {
   );
 }
 
+// const Test = () => {
+//   return (
+//     <div
+//       className="w-screen h-screen"
+//       style={{
+//         backgroundImage: 'Url("/Hero Section.png")',
+//         backgroundRepeat: "none",
+//         backgroundPosition: "center",
+//         backgroundSize: "cover",
+//         backgroundAttachment: "fixed",
+//       }}
+//     >
+//       <nav className="w-full m-auto flex gap-2">
+//         <h1 className="text-white text-3xl">logo</h1>
+//         <ul className="w-full text-white flex text-xl m-auto gap-2">
+//           <li>Hello</li>
+//           <li>Hello</li>
+//           <li>Hello</li>
+//           <li>Hello</li>
+//           <li>Hello</li>
+//         </ul>
+//         <div></div>
+//       </nav>
+//     </div>
+//   );
+// };
+
 const AllRoutes = () => {
   return (
     <Routes>
+      {/* <Route path="/test" element={<Test />} /> */}
       <Route path="/" element={<Navigate to={"/dashboard"} />} />
       <Route
         path="/dashboard"
@@ -74,6 +105,14 @@ const AllRoutes = () => {
         element={
           <ProtectedRoute>
             <Chat_Page />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/profile/me"
+        element={
+          <ProtectedRoute>
+            <MyProfile />
           </ProtectedRoute>
         }
       />
