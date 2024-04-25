@@ -4,7 +4,7 @@ import cookieParser from "cookie-parser";
 import { config } from "dotenv";
 
 import { connectToDb } from "./db/db.js";
-import { verifySesssion } from "./middlewares/auth.middleware.js";
+import { verifySesssion, extractIP } from "./middlewares/auth.middleware.js";
 import authRoute from "./routes/auth.routes.js";
 import fileRoutes from "./routes/file.routes.js";
 import qaRoutes from "./routes/qa.routes.js";
@@ -26,6 +26,7 @@ app.use(
 
 app.use(cookieParser());
 app.use(express.json());
+app.use(extractIP);
 
 app.use(authRoute);
 app.get("/authenticated", verifySesssion, (req, res) => {

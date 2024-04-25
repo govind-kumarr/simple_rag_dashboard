@@ -10,3 +10,8 @@ export const verifySesssion = async (req, res, next) => {
     return res.status(401).send();
   }
 };
+
+export const extractIP = async (req, res, next) => {
+  const ip = req.headers["x-forwarded-for"] || req.socket.remoteAddress;
+  next();
+};

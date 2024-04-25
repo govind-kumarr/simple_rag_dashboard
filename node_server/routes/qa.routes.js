@@ -10,6 +10,7 @@ const qa_manager = new QA_Manager("unknown");
 
 const getUserInfo = async (req, res, next) => {
   const { user } = req.user;
+  const { chatId } = req.body;
   const pipeline = [
     { $match: { _id: user } },
     { $set: { id: { $toString: "$_id" } } },
@@ -19,7 +20,7 @@ const getUserInfo = async (req, res, next) => {
   req.user = response;
   qa_manager.setcollectionName(response.id);
   if (!qa_manager.chain) {
-    await qa_manager.initializeChain();
+    await qa_manager.initializeChain(chatId);
   }
   next();
 };

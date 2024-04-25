@@ -46,6 +46,8 @@ export const handleFileUpload = (req, res) => {
           return doc;
         });
         await addDocsToChroma(user_id, docs);
+        res.uploadStatus = true;
+        await res.save();
       } catch (err) {
         console.log(err);
       }
@@ -55,4 +57,28 @@ export const handleFileUpload = (req, res) => {
       details: "File uploaded successfully!",
     });
   });
+};
+
+export const getMemoryInfo = async (req, res) => {
+  const { user } = req.user;
+
+  const pipeline = [
+    [
+      { $group: { _id: { owner: user }, totalSize: { $sum: "$size" } } },
+      { $project: { totalSize: 1, _id: 0 } },
+    ],
+  ];
+  const result = await FileMetadata.aggregate(pipeline);
+  if (result) {
+    const { totalSize: memoryConsumed } = result[0];
+    const totalLimit = 1024 * 1024 * 50; // 50Mbs
+    const remaining = totalLimit - memoryConsumed;
+    res.json({
+      details: {
+        memoryConsumed,
+        remaining,
+        totalLimit,
+      },
+    });
+  }
 };
