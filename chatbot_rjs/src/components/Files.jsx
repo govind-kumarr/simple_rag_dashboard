@@ -1,11 +1,11 @@
-import React, { useState } from "react";
+import React, { useCallback, useState } from "react";
 import moment from "moment";
 import { FailTag, SuccessTag } from "./Tags";
+import { instance } from "../config/axios_config";
 
-const File_Row = ({ file, selectAll }) => {
+const File_Row = ({ file, selectAll, handleFileDelete }) => {
   const { fileName, uploadDate, uploadStatus, type } = file;
   const [checked, setChecked] = useState(false);
-  console.log(file);
   return (
     <tr className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
       <td className="w-4 p-4">
@@ -38,23 +38,28 @@ const File_Row = ({ file, selectAll }) => {
         )}
       </td>
       <td className="px-6 py-4">
-        <a
-          href="#"
+        <button
+          onClick={() => handleFileDelete(file._id)}
           className="font-medium text-red-600 dark:text-red-500 hover:underline"
         >
           Delete
-        </a>
+        </button>
       </td>
     </tr>
   );
 };
 
-const Files = ({ files, selectAll }) => {
+const Files = ({ files, selectAll, handleFileDelete }) => {
   return (
     <tbody>
       {files.length > 0 ? (
         files.map((file) => (
-          <File_Row key={file._id} file={file} selectAll={selectAll} />
+          <File_Row
+            key={file._id}
+            file={file}
+            selectAll={selectAll}
+            handleFileDelete={handleFileDelete}
+          />
         ))
       ) : (
         <tr>

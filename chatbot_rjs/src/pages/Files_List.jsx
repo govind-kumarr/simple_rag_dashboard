@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import Navbar from "../components/Navbar";
 import Sidebar from "../components/Sidebar";
 import Files from "../components/Files";
@@ -18,6 +18,20 @@ const Files_List = () => {
   };
   useEffect(() => {
     get_files();
+  }, []);
+
+  const handleFileDelete = useCallback(async (id) => {
+    try {
+      const response = await instance.delete(`/api/v1/files/${id}`);
+      if (response.status === 200) {
+        console.log("File deleted successfully");
+        const { data } = response;
+        get_files();
+        console.log(data);
+      }
+    } catch (error) {
+      console.error(error);
+    }
   }, []);
   return (
     <>
@@ -60,7 +74,11 @@ const Files_List = () => {
                   </th>
                 </tr>
               </thead>
-              <Files files={files} selectAll={selectAll} />
+              <Files
+                files={files}
+                selectAll={selectAll}
+                handleFileDelete={handleFileDelete}
+              />
             </table>
             <nav
               className="flex items-center flex-column flex-wrap md:flex-row justify-between p-4"

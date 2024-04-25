@@ -29,7 +29,7 @@ const SignUp = () => {
     if (!email || !password || !againPassword || passwordMatch != true) {
       return;
     }
-    callRegisterAPI({ username: email, password: password });
+    callRegisterAPI({ email, password });
   };
 
   const handlePasswordMatch = (enteredPassword) => {

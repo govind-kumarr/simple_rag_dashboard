@@ -3,13 +3,13 @@ import { Hamburger } from "../assets/icons.jsx";
 import { instance } from "../config/axios_config.js";
 import { Link } from "react-router-dom";
 
-const Navbar = (props) => {
+const Navbar = () => {
   const [showUserDropdown, setShowUserDropDown] = useState(false);
   const [user, setUser] = useState({});
   const getUser = async () => {
     try {
       const { data } = await instance.get("/api/v1/users/me");
-      console.log(data);
+      setUser(data[0]);
       return data[0];
     } catch (error) {
       console.log("Error occured while getting profile details :", error);
@@ -46,16 +46,16 @@ const Navbar = (props) => {
                   />
                 </svg>
               </button>
-              <a href="#" className="flex ms-2 md:me-24">
+              <Link to="/dashboard" className="flex ms-2 md:me-24">
                 <img
-                  src="https://flowbite.com/docs/images/logo.svg"
                   className="h-8 me-3"
-                  alt="FlowBite Logo"
+                  src="/favicon-32x32.png"
+                  alt="DocTalk Logo"
                 />
                 <span className="self-center text-xl font-semibold sm:text-2xl whitespace-nowrap dark:text-white">
-                  Flowbite
+                  DocTalk
                 </span>
-              </a>
+              </Link>
             </div>
             <div className="flex items-center">
               <div className="flex items-center ms-3 relative">
@@ -70,7 +70,7 @@ const Navbar = (props) => {
                     <span className="sr-only">Open user menu</span>
                     <img
                       className="w-8 h-8 rounded-full"
-                      src="https://flowbite.com/docs/images/people/profile-picture-5.jpg"
+                      src={user?.avatar_url}
                       alt="user photo"
                     />
                   </button>
@@ -144,4 +144,4 @@ const Navbar = (props) => {
   );
 };
 
-export default Navbar;
+export default React.memo(Navbar);

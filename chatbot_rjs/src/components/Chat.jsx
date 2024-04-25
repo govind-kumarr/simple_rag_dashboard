@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import Markdown from "react-markdown";
 import { instance } from "../config/axios_config";
 
 const Chat_Message = (props) => {
@@ -15,9 +16,9 @@ const Chat_Message = (props) => {
       <p
         className={`text-${
           sender.toUpperCase() == "AI" ? "gray-700" : "white"
-        }`}
+        } text-lg`}
       >
-        {content}
+        <Markdown>{content}</Markdown>
       </p>
     </div>
   );
