@@ -9,6 +9,7 @@ import Files_List from "../pages/Files_List";
 import Chat_Page from "../pages/Chat_Page";
 import MyProfile from "../pages/MyProfile";
 import { toast } from "react-toastify";
+import Spinner from "../components/Spinner";
 
 function ProtectedRoute({ children }) {
   const [loading, setLoading] = useState(true);
@@ -31,7 +32,14 @@ function ProtectedRoute({ children }) {
   }, []);
 
   if (loading) {
-    return <div>Loading...</div>;
+    return (
+      <div className="relative h-screen w-screen">
+        <div className="flex items-center absolute top-1/2 left-1/2 gap-4 -translate-x-1/2 -translate-y-1/2">
+          <p className="text-2xl self-end mt-2">Loading...</p>
+          <Spinner />
+        </div>
+      </div>
+    );
   }
   return <>{isAuth ? children : <Navigate to={"/signin"} replace={true} />}</>;
 }

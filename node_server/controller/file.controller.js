@@ -26,11 +26,9 @@ export const handleFileUpload = (req, res) => {
   const form = formidable();
   form.parse(req, async (err, fields, files) => {
     if (err) {
-      return res
-        .json({
-          details: "Error parsing file!",
-        })
-        .status(400);
+      return res.status(400).json({
+        details: "Error parsing file!",
+      });
     }
 
     const allPromsies = Object.values(files).map(async ([file]) => {

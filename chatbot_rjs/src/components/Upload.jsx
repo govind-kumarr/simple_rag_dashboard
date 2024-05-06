@@ -2,6 +2,7 @@ import axios from "axios";
 import React, { useState } from "react";
 import FIlecard from "./FIlecard";
 import { instance } from "../config/axios_config";
+import { toast, Bounce } from "react-toastify";
 
 const Upload = () => {
   const [files, setFiles] = useState([]);
@@ -16,16 +17,26 @@ const Upload = () => {
       "image/gif",
     ];
     const maxFiles = 5;
-
     if (selectedFiles.length > maxFiles) {
-      setError(`You can upload up to ${maxFiles} files`);
+      toast.warn("You can upload max 5 files at once!", {
+        position: "top-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "light",
+        transition: Bounce,
+      });
+      setError(`You can upload up to ${maxFiles} files at a time`);
       return;
     }
 
     const newFiles = Array.from(selectedFiles);
 
-    // Checking is skipped for now
-    // for (let i = 0; i < newFiles.length; i++) {
+    // Checking is skipped htmlFor now
+    // htmlFor (let i = 0; i < newFiles.length; i++) {
     //   const file = newFiles[i];
 
     //   if (!allowedTypes.includes(file.type)) {
@@ -48,14 +59,14 @@ const Upload = () => {
 
   return (
     <>
-      <div class="flex items-center justify-center w-full">
+      <div className="flex items-center justify-center w-full">
         <label
-          for="dropzone-file"
-          class="flex flex-col items-center justify-center w-full h-64 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 dark:hover:bg-bray-800 dark:bg-gray-700 hover:bg-gray-100 dark:border-gray-600 dark:hover:border-gray-500 dark:hover:bg-gray-600"
+          htmlFor="dropzone-file"
+          className="flex flex-col items-center justify-center w-full h-64 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 dark:hover:bg-bray-800 dark:bg-gray-700 hover:bg-gray-100 dark:border-gray-600 dark:hover:border-gray-500 dark:hover:bg-gray-600"
         >
-          <div class="flex flex-col items-center justify-center pt-5 pb-6">
+          <div className="flex flex-col items-center justify-center pt-5 pb-6">
             <svg
-              class="w-8 h-8 mb-4 text-gray-500 dark:text-gray-400"
+              className="w-8 h-8 mb-4 text-gray-500 dark:text-gray-400"
               aria-hidden="true"
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
@@ -69,18 +80,18 @@ const Upload = () => {
                 d="M13 13h3a3 3 0 0 0 0-6h-.025A5.56 5.56 0 0 0 16 6.5 5.5 5.5 0 0 0 5.207 5.021C5.137 5.017 5.071 5 5 5a4 4 0 0 0 0 8h2.167M10 15V6m0 0L8 8m2-2 2 2"
               />
             </svg>
-            <p class="mb-2 text-sm text-gray-500 dark:text-gray-400">
-              <span class="font-semibold">Click to upload</span> or drag and
+            <p className="mb-2 text-sm text-gray-500 dark:text-gray-400">
+              <span className="font-semibold">Click to upload</span> or drag and
               drop
             </p>
-            <p class="text-xs text-gray-500 dark:text-gray-400">
-              SVG, PNG, JPG or GIF (MAX. 800x400px)
+            <p className="text-xs text-gray-500 dark:text-gray-400">
+              PDF, Excel, Word, PowerPoint, CSV, Text, JSON
             </p>
           </div>
           <input
             id="dropzone-file"
             type="file"
-            class="hidden"
+            className="hidden"
             accept=".pdf,.xlsx,.xls,.doc,.docx,.ppt,.pptx,.csv,.txt,.json"
             onChange={handleFileChange}
             multiple

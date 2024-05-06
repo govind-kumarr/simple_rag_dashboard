@@ -11,10 +11,47 @@ const router = Router();
 router.get("/memory-info", getMemoryInfo);
 
 router.get("/files", async (req, res) => {
-  // retrieve all files from the database match the query and send to client
-  const { user } = req.user;
-  const files = await FileMetadata.find({ owner: user });
-  res.send(files);
+  try {
+    const { user } = req.user;
+    const queryParams = req.query;
+    const defaultParams = {
+      pageSize: 10,
+      pageNo: 1,
+    };
+
+    const pageSize = Number(queryParams.pageSize || defaultParams.pageSize);
+    let pageIndex =
+      Number(
+        (queryParams.pageNo && queryParams.pageNo > 0 && queryParams.pageNo) ||
+          defaultParams.pageNo
+      ) - 1;
+
+    const pipeline = [{ $match: { owner: user } }, { $count: "totalFiles" }];
+    const [{ totalFiles }] = await FileMetadata.aggregate(pipeline);
+    const totalPages = Math.ceil(totalFiles / pageSize);
+
+    // console.log({ totalPages, pageNo: queryParams.pageNo, pageIndex });
+
+    pageIndex = pageIndex + 1 > totalPages ? 0 : pageIndex;
+
+    const skip = pageSize * pageIndex;
+
+    const filesPipeline = [
+      { $match: { owner: user } },
+      { $skip: skip },
+      { $limit: pageSize },
+    ];
+
+    const files = await FileMetadata.aggregate(filesPipeline);
+
+    res.send({
+      files,
+      pageOptions: { totalPages, pageSize, pageNo: pageIndex + 1 },
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).send(error.message);
+  }
 });
 
 router.post("/file/upload", handleFileUpload);

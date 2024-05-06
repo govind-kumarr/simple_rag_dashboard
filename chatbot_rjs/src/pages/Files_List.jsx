@@ -7,18 +7,23 @@ import { instance } from "../config/axios_config";
 const Files_List = () => {
   const [files, setFiles] = useState([]);
   const [selectAll, setSelectAll] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(0);
   const get_files = async () => {
     try {
-      const res = await instance.get("/api/v1/files");
+      const res = await instance.get(
+        `/api/v1/files?pageSize=10&pageNo=${currentPage}`
+      );
       console.log(res);
-      setFiles(res.data);
+      setFiles(res.data.files);
+      setTotalPages(res.data.pageOptions.totalPages);
     } catch (error) {
       console.log(error);
     }
   };
   useEffect(() => {
     get_files();
-  }, []);
+  }, [currentPage]);
 
   const handleFileDelete = useCallback(async (id) => {
     try {
@@ -91,66 +96,32 @@ const Files_List = () => {
                 </span>{" "}
                 of{" "}
                 <span className="font-semibold text-gray-900 dark:text-white">
-                  {files.length}
+                  {files.length || 0}
                 </span>
               </span>
               <ul className="inline-flex -space-x-px rtl:space-x-reverse text-sm h-8">
                 <li>
-                  <a
-                    href="#"
-                    className="flex items-center justify-center px-3 h-8 ms-0 leading-tight text-gray-500 bg-white border border-gray-300 rounded-s-lg hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
+                  <button
+                    disabled={currentPage === 1}
+                    className="flex items-center justify-center px-3 h-8 leading-tight text-gray-500 bg-white border border-gray-300 rounded-s-lg hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
+                    onClick={() => setCurrentPage((prev) => prev - 1)}
                   >
-                    Previous
-                  </a>
+                    Prev
+                  </button>
                 </li>
                 <li>
-                  <a
-                    href="#"
-                    className="flex items-center justify-center px-3 h-8 leading-tight text-gray-500 bg-white border border-gray-300 hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
-                  >
-                    1
-                  </a>
+                  <button className="flex items-center justify-center px-3 h-8 leading-tight text-gray-500 bg-white border border-gray-300 hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white">
+                    {currentPage}
+                  </button>
                 </li>
                 <li>
-                  <a
-                    href="#"
-                    className="flex items-center justify-center px-3 h-8 leading-tight text-gray-500 bg-white border border-gray-300 hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
-                  >
-                    2
-                  </a>
-                </li>
-                <li>
-                  <a
-                    href="#"
-                    aria-current="page"
-                    className="flex items-center justify-center px-3 h-8 text-blue-600 border border-gray-300 bg-blue-50 hover:bg-blue-100 hover:text-blue-700 dark:border-gray-700 dark:bg-gray-700 dark:text-white"
-                  >
-                    3
-                  </a>
-                </li>
-                <li>
-                  <a
-                    href="#"
-                    className="flex items-center justify-center px-3 h-8 leading-tight text-gray-500 bg-white border border-gray-300 hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
-                  >
-                    4
-                  </a>
-                </li>
-                <li>
-                  <a
-                    href="#"
-                    className="flex items-center justify-center px-3 h-8 leading-tight text-gray-500 bg-white border border-gray-300 hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
-                  >
-                    5
-                  </a>
-                </li>
-                <li>
-                  <a
-                    href="#"
+                  <button
+                    disabled={currentPage === totalPages}
                     className="flex items-center justify-center px-3 h-8 leading-tight text-gray-500 bg-white border border-gray-300 rounded-e-lg hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
+                    onClick={() => setCurrentPage((prev) => prev + 1)}
                   >
                     Next
-                  </a>
+                  </button>
                 </li>
               </ul>
             </nav>

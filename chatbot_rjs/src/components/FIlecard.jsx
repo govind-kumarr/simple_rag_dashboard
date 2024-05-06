@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { toast } from "react-toastify";
 
 const FIlecard = ({ file, uploadFiles }) => {
   const { name: fileName, size, type, lastModified } = file;
@@ -11,16 +12,24 @@ const FIlecard = ({ file, uploadFiles }) => {
   const [status, setStatus] = useState(status_values.READY);
   // Function to handle button click
   const handleButtonClick = async () => {
-    setStatus(status_values.UPLOADING);
-    const formdata = new FormData();
-    formdata.append("file", file);
-    const res = await uploadFiles(formdata);
-    console.log(res);
-    if (res.status === 200) {
-      console.log("Uploaded file successfully");
-      setStatus(status_values.UPLOADED);
-    } else {
-      setStatus(status_values.ERROR);
+    try {
+      setStatus(status_values.UPLOADING);
+      const formdata = new FormData();
+      formdata.append("file", file);
+      const res = await uploadFiles(formdata);
+      console.log(res);
+      if (res.status === 200) {
+        console.log("Uploaded file successfully");
+        setStatus(status_values.UPLOADED);
+      } else {
+        console.log("Error uploading file");
+        setStatus(status_values.ERROR);
+      }
+    } catch (error) {
+      if (error.name === "AxiosError") {
+        setStatus(status_values.ERROR);
+        toast.error(error.response.data.details);
+      }
     }
   };
   return (
@@ -30,12 +39,12 @@ const FIlecard = ({ file, uploadFiles }) => {
         <button
           disabled
           type="button"
-          class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800 inline-flex items-center"
+          className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800 inline-flex items-center"
         >
           <svg
             aria-hidden="true"
             role="status"
-            class="inline w-4 h-4 me-3 text-white animate-spin"
+            className="inline w-4 h-4 me-3 text-white animate-spin"
             viewBox="0 0 100 101"
             fill="none"
             xmlns="http://www.w3.org/2000/svg"
@@ -55,10 +64,10 @@ const FIlecard = ({ file, uploadFiles }) => {
       {status === status_values.UPLOADED && (
         <button
           type="button"
-          class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center me-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+          className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center me-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
         >
           <svg
-            class="w-3.5 h-3.5 me-2 text-white dark:text-white"
+            className="w-3.5 h-3.5 me-2 text-white dark:text-white"
             aria-hidden="true"
             xmlns="http://www.w3.org/2000/svg"
             width="24"
@@ -82,6 +91,15 @@ const FIlecard = ({ file, uploadFiles }) => {
           onClick={handleButtonClick}
         >
           Upload
+        </button>
+      )}
+
+      {status === status_values.ERROR && (
+        <button
+          type="button"
+          className={`text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-red-600 dark:hover:bg-red-700 focus:outline-none dark:focus:ring-red-800 `}
+        >
+          Error
         </button>
       )}
     </li>
