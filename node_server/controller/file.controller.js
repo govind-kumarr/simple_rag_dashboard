@@ -2,6 +2,7 @@ import formidable from "formidable";
 import { addDocsToChroma } from "./chroma.controllers.js";
 import { createDocsFromFile } from "./document.controller.js";
 import { FileMetadata } from "../models/File.model.js";
+import mongoose from "mongoose";
 
 function extractFileMetdata(file, owner) {
   const {
@@ -61,22 +62,37 @@ export const getMemoryInfo = async (req, res) => {
   const { user } = req.user;
 
   const pipeline = [
-    [
-      { $group: { _id: { owner: user }, totalSize: { $sum: "$size" } } },
-      { $project: { totalSize: 1, _id: 0 } },
-    ],
+    { $match: { owner: user } },
+    { $group: { _id: null, totalSize: { $sum: "$size" } } },
+    { $project: { totalSize: 1, _id: 0 } },
   ];
-  const result = await FileMetadata.aggregate(pipeline);
-  if (result) {
-    const { totalSize: memoryConsumed } = result[0];
-    const totalLimit = 1024 * 1024 * 50; // 50Mbs
-    const remaining = totalLimit - memoryConsumed;
-    res.json({
-      details: {
-        memoryConsumed,
-        remaining,
-        totalLimit,
-      },
-    });
+
+  try {
+    const result = await FileMetadata.aggregate(pipeline);
+
+    if (result.length > 0) {
+      const { totalSize: memoryConsumed } = result[0];
+      const totalLimit = 1024 * 1024 * 50; // 50MB in bytes
+      const remaining = totalLimit - memoryConsumed;
+      res.json({
+        details: {
+          memoryConsumed,
+          remaining,
+          totalLimit,
+        },
+      });
+    } else {
+      // Handle case where no files are associated with the user
+      res.json({
+        details: {
+          memoryConsumed: 0,
+          remaining: 1024 * 1024 * 50, // Full available limit
+          totalLimit: 1024 * 1024 * 50, // 50MB in bytes
+        },
+      });
+    }
+  } catch (error) {
+    console.error("Error fetching memory info:", error);
+    res.status(500).json({ error: "Internal server error" });
   }
 };

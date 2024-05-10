@@ -6,6 +6,9 @@ const UserSchema = mongoose.Schema(
       type: String,
       unique: true,
     },
+    full_name: {
+      type: String,
+    },
     password: {
       type: String,
     },
@@ -18,6 +21,17 @@ const UserSchema = mongoose.Schema(
     email: {
       type: String,
       default: "",
+    },
+    email_verified: {
+      type: Boolean,
+      default: false,
+    },
+    method: {
+      type: String,
+      default: "local",
+    },
+    verfication_token: {
+      type: String,
     },
   },
   { timestamps: true }

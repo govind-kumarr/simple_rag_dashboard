@@ -2,7 +2,6 @@ import express from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import { config } from "dotenv";
-
 import { connectToDb } from "./db/db.js";
 import { verifySesssion, extractIP } from "./middlewares/auth.middleware.js";
 import authRoute from "./routes/auth.routes.js";

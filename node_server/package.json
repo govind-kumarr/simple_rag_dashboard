@@ -12,6 +12,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "axios": "^1.6.8",
     "bcrypt": "^5.1.1",
     "chromadb": "^1.8.1",
     "cookie-parser": "^1.4.6",
@@ -25,8 +26,6 @@
     "mongoose": "^8.2.1",
     "nodemon": "^3.1.0",
     "officeparser": "^4.0.8",
-    "passport": "^0.7.0",
-    "passport-local": "^1.0.0",
     "pdf-parse": "^1.1.1",
     "uuid": "^9.0.1"
   }

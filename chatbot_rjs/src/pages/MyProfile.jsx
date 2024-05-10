@@ -1,18 +1,10 @@
-import React, { useState } from "react";
-import Sidebar from "../components/Sidebar";
-import Navbar from "../components/Navbar";
+import React from "react";
 
 const MyProfile = () => {
   return (
-    <>
-      <Navbar />
-      <Sidebar />
-      <div className="p-4 sm:ml-64">
-        <div className="p-4  border-gray-200 dark:border-gray-700 mt-14">
-          {/* <Upload /> */}
-        </div>
-      </div>
-    </>
+    <div className="p-4 sm:ml-64">
+      <div className="p-4  border-gray-200 dark:border-gray-700 mt-14"></div>
+    </div>
   );
 };
 

@@ -109,11 +109,15 @@ const Chat = ({ chat }) => {
   return (
     <div className="h-[calc(100vh-7.5rem)] flex flex-col">
       <div className="flex-grow overflow-auto flex flex-col gap-1 mb-4 pr-2">
-        {messages &&
-          messages.length > 0 &&
+        {messages && messages.length > 0 ? (
           messages.map((message, index) => (
             <Chat_Message key={index} {...message} />
-          ))}
+          ))
+        ) : (
+          <div className="w-full h-full flex justify-center items-center">
+            <h1 className="text-gray-700 font-bold">No messages</h1>
+          </div>
+        )}
       </div>
       <div className="">
         <UserInput addUserMessage={addUserMessage} />

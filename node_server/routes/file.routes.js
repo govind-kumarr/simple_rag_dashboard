@@ -27,7 +27,16 @@ router.get("/files", async (req, res) => {
       ) - 1;
 
     const pipeline = [{ $match: { owner: user } }, { $count: "totalFiles" }];
-    const [{ totalFiles }] = await FileMetadata.aggregate(pipeline);
+    const response = await FileMetadata.aggregate(pipeline);
+    let totalFiles;
+    if (Array.isArray(response) && response.length > 0) {
+      [{ totalFiles }] = response;
+    } else {
+      return res.send({
+        files:[],
+        pageOptions: { totalPages: 0, pageSize, pageNo: pageIndex + 1 },
+      });
+    }
     const totalPages = Math.ceil(totalFiles / pageSize);
 
     // console.log({ totalPages, pageNo: queryParams.pageNo, pageIndex });

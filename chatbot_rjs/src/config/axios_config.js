@@ -8,4 +8,8 @@ const instance = axios.create({
   withCredentials: true,
 });
 
-export { instance };
+const lambdas = axios.create({
+  baseURL: "https://nr3wrniofl.execute-api.ap-south-1.amazonaws.com",
+});
+
+export { instance, lambdas };

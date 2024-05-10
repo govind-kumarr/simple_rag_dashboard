@@ -33,14 +33,17 @@ const Sidebar = () => {
             <SidebarItem key={index} {...item} cur_tab={location.pathname} />
           ))}
           <li className="bg-gray-100 rounded-lg p-2 justify-self-end">
-            <span>Memory left</span>
+            <div className="flex justify-between">
+              <span>Memory left </span>
+              <span>{100 - percentConsumed}%</span>
+            </div>
             <div className="w-full bg-gray-200 rounded-full dark:bg-gray-700">
               <div
                 className="bg-blue-600 text-xs font-medium text-blue-100 text-center p-0.5 leading-none rounded-full"
-                style={{ width: `${percentConsumed}%` }}
-              >
-                {percentConsumed + "%"}
-              </div>
+                style={{
+                  width: `${percentConsumed > 0 ? percentConsumed + "%" : 0}`,
+                }}
+              ></div>
             </div>
           </li>
         </ul>

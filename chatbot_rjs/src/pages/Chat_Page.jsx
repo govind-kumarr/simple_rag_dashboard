@@ -22,18 +22,14 @@ const Chat_Page = () => {
     getChats();
   }, []);
   return (
-    <div>
-      <Navbar />
-      <Sidebar />
-      <div className="p-4 sm:ml-64">
-        <div className="p-4 pl-1 pt-1 border-gray-200 dark:border-gray-700 mt-14 grid grid-cols-[20%_80%]">
-          <Chat_sidebar
-            chats={chats}
-            changeChat={changeChat}
-            currentChat={currentChat}
-          />
-          <Chat chat={currentChat} />
-        </div>
+    <div className="p-4 sm:ml-64">
+      <div className="p-4 pl-1 pt-1 border-gray-200 dark:border-gray-700 mt-14 grid grid-cols-[20%_80%]">
+        <Chat_sidebar
+          chats={chats}
+          changeChat={changeChat}
+          currentChat={currentChat}
+        />
+        <Chat chat={currentChat} />
       </div>
     </div>
   );
