@@ -10,7 +10,7 @@ const EmailVerification = () => {
           <div className="w-full p-6 bg-white rounded-lg shadow dark:border md:mt-0 sm:max-w-md dark:bg-gray-800 dark:border-gray-700 sm:p-8">
             <div className="flex justify-center gap-2 items-center my-2 mt-0">
               <div className="-mt-1">
-                <img src="../../public/verification.svg" alt="" />
+                <img src="/verification.svg" alt="" />
               </div>
               <h1 className=" text-center text-xl font-bold leading-tight tracking-tight text-gray-900 md:text-2xl dark:text-white">
                 Email Vefification

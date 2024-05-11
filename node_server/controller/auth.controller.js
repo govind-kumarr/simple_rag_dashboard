@@ -47,7 +47,6 @@ export const loginController = async (req, res) => {
 
 export const sendVerificationEmail = async (req, res) => {
   const email = req.body.email;
-  console.log(email);
   const existingUser = await UserModel.findOne({ email });
   if (!existingUser)
     return res.json({ details: "No user find with this email!" });
@@ -78,7 +77,7 @@ export const verifyEmail = async (req, res) => {
   await User.save();
 
   console.log("Email Verified!");
-  res.redirect(process.env.ORIGIN);
+  res.redirect(process.env.REDIRECT_URL);
 };
 
 export const logoutController = async (req, res) => {
