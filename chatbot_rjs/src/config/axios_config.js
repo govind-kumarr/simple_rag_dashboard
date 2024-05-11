@@ -9,7 +9,7 @@ const instance = axios.create({
 });
 
 const lambdas = axios.create({
-  baseURL: "https://nr3wrniofl.execute-api.ap-south-1.amazonaws.com",
+  baseURL: "http://localhost:3000",
 });
 
 export { instance, lambdas };

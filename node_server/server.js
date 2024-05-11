@@ -33,6 +33,10 @@ app.get("/authenticated", verifySesssion, (req, res) => {
   res.send(true);
 });
 
+app.get("/", (req, res) => {
+  res.send("Welcome to the chatbot server");
+});
+
 app.get("/api/v1/users/me", verifySesssion, async (req, res) => {
   const { user } = req.user;
   const completeUser = await UserModel.aggregate([

@@ -4,6 +4,8 @@ import {
   loginController,
   logoutController,
   registerController,
+  sendVerificationEmail,
+  verifyEmail,
 } from "../controller/auth.controller.js";
 import { config } from "dotenv";
 import axios from "axios";
@@ -26,6 +28,10 @@ router.get("/auth/google/callback", googleAuthCallback);
 router.post("/auth/login", loginController);
 
 router.post("/logout", logoutController);
+
+router.post("/auth/send-verification-email", sendVerificationEmail);
+
+router.get("/auth/verify-email/:token", verifyEmail);
 
 router.post("/auth/register", registerController);
 
