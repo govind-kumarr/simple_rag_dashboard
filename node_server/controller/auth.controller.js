@@ -34,7 +34,7 @@ export const loginController = async (req, res) => {
   const passwordMatch = isValidPassword(user, password);
 
   if (!passwordMatch) return res.json({ details: "Wrong password!" });
-  const { sid, expires, maxAge } = createSession(user._id);
+  const { sid, expires, maxAge } = await createSession(user._id);
   res.cookie("sid", sid, {
     httpOnly: true,
     secure: NOD_ENV === "PROD",
@@ -100,21 +100,27 @@ const createChat = async (user) => {
 
 const createUser = async (user) => {
   const { email, password } = user;
+  const username = email.split("@")[0];
   const hash = createHash(password);
-  const new_user = await UserModel.create({ email, password: hash });
+  const new_user = await UserModel.create({ email, password: hash, username });
   const chat = await createChat(new_user);
   new_user.chats = [chat._id];
   await new_user.save();
 };
 
 export const registerController = async (req, res) => {
-  const { email, password } = req.body;
-  if (!email || !password)
-    return res.json({ details: "email or password is missing!" });
-  const user = await UserModel.findOne({ email });
-  if (user) return res.json({ details: "email already exists!" });
-  await createUser({ email, password });
-  res.json({ details: "Registered Successfully!" });
+  try {
+    const { email, password } = req.body;
+    if (!email || !password)
+      return res.json({ details: "email or password is missing!" });
+    const user = await UserModel.findOne({ email });
+    if (user) return res.json({ details: "email already exists!" });
+    await createUser({ email, password });
+    res.json({ details: "Registered Successfully!" });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ details: "Error registering!" });
+  }
 };
 
 export const verifyUserName = async (req, res) => {
