@@ -1,5 +1,6 @@
 import { Router } from "express";
 import { ChatModel } from "../models/Chat.model.js";
+import { createNewChats } from "../controller/auth.controller.js";
 
 const router = Router();
 
@@ -7,9 +8,9 @@ router.get("/chats", async (req, res) => {
   const { user } = req.user;
   const pipeline = [{ $match: { intialized_by: user } }];
   // const chats = await ChatModel.aggregate(pipeline).populate("messages");
-  const newChats = await ChatModel.find({ intialized_by: user }).populate(
-    "messages"
-  );
+  const newChats = await ChatModel.find({ intialized_by: user })
+    .populate("messages")
+    .sort({ createdAt: -1 });
   res.send(newChats);
 });
 
@@ -37,5 +38,7 @@ router.post("/chats", async (req, res) => {
     chatId: chat._id,
   });
 });
+
+router.post("/createNewChats", createNewChats);
 
 export default router;
