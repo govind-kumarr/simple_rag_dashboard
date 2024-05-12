@@ -213,3 +213,42 @@ export const googleAuthCallback = async (req, res) => {
     res.redirect(origin);
   }
 };
+
+export const createNewChats = async (req, res) => {
+  try {
+    const chatTitle = req.body.chatTitle;
+    const userId = req.user.user;
+    let user = {
+      _id: userId,
+    };
+    const userDetails = await UserModel.findById(userId);
+    const secondLastChatId = userDetails.chats[userDetails.chats.length - 1];
+    // check last chat messages if empty, did not create new
+    const lastChat = await ChatModel.find({
+      intialized_by: userId,
+      _id: secondLastChatId,
+    });
+    if (lastChat[0]?.messages.length === 0) {
+      return res.json({
+        message: "use last chat",
+      });
+    }
+    const chat = await createChat(user);
+    if (chatTitle) {
+      chat.title = chatTitle;
+    } else {
+      const date = new Date();
+      chat.title = `New Chat ${date.getDate()}${date.getMilliseconds()}`;
+    }
+    await chat.save();
+    userDetails.chats.push(chat._id);
+    await userDetails.save();
+    res.status(201).json({
+      message: "chat created success",
+    });
+  } catch (error) {
+    res.status(error.status || 500).json({
+      message: error.message || "something went wrong",
+    });
+  }
+};
