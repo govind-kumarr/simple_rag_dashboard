@@ -23,6 +23,21 @@ const Sidebar = () => {
   useEffect(() => {
     getMemoryInfo();
   }, []);
+  const handleVerifyEmail = async () => {
+    const res = await instance.post(
+      "/api/v1/get-user",
+      {},
+      {
+        withCredentials: true,
+      }
+    );
+    console.log(res);
+    if (res.data.email_verified) {
+      if (res.status === 200 && res.statusText === "OK") {
+        navigate("/verify-email");
+      }
+    }
+  };
   return (
     <aside
       id="logo-sidebar"
@@ -50,7 +65,7 @@ const Sidebar = () => {
           </li>
           <button
             className="bg-[#1E40B0] text-white px-4 py-2 rounded-md"
-            onClick={() => navigate("/verify-email")}
+            onClick={() => handleVerifyEmail()}
           >
             Verify Email
           </button>

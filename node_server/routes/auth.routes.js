@@ -1,5 +1,6 @@
 import { Router } from "express";
 import {
+  getUserDetails,
   googleAuthCallback,
   loginController,
   logoutController,
@@ -28,6 +29,10 @@ router.get("/auth/google/callback", googleAuthCallback);
 router.post("/auth/login", loginController);
 
 router.post("/logout", logoutController);
+
+// create route to get all the details of the user this is useful for checking is user verified email or not
+
+router.post("/get-user", getUserDetails);
 
 router.post("/auth/send-verification-email", sendVerificationEmail);
 

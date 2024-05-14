@@ -98,6 +98,21 @@ const createChat = async (user) => {
   }
 };
 
+export const getUserDetails = async (req, res) => {
+  const sid = req.cookies.sid;
+  const session = await SessionModel.findOne({
+    sid,
+  });
+  if (!session) return res.json({ details: "No session found!" });
+  const user = await UserModel.findById(session.user);
+  if (!user) return res.json({ details: "No user found!" });
+  return res.json({
+    success: true,
+    message: "User details fetched successfully!",
+    user,
+  });
+};
+
 const createUser = async (user) => {
   const { email, password } = user;
   const username = email.split("@")[0];
