@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from "react";
 import SidebarItem from "./SidebarItem";
 import { sidebarItems } from "../assets/sidebarItems";
-import { useLocation } from "react-router-dom";
+import { Navigate, useLocation } from "react-router-dom";
 import { instance } from "../config/axios_config";
+import { useNavigate } from "react-router-dom";
 
 const Sidebar = () => {
+  const navigate = useNavigate();
   const location = useLocation();
   const [percentConsumed, setPercentConsumed] = useState(0);
   const getMemoryInfo = async () => {
@@ -46,6 +48,12 @@ const Sidebar = () => {
               ></div>
             </div>
           </li>
+          <button
+            className="bg-[#1E40B0] text-white px-4 py-2 rounded-md"
+            onClick={() => navigate("/verify-email")}
+          >
+            Verify Email
+          </button>
         </ul>
       </div>
     </aside>
