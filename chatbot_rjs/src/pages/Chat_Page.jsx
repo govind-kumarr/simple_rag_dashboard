@@ -7,6 +7,7 @@ import Chat_sidebar from "../components/Chat_sidebar";
 
 const Chat_Page = () => {
   const [chats, setChats] = useState([]);
+  const [chatTitle, setChatTitle] = useState("");
   const [currentChat, setCurrentChat] = useState(null);
   async function getChats() {
     const { data } = await instance.get("/api/v1/chats");
@@ -18,6 +19,15 @@ const Chat_Page = () => {
     console.log({ currentChat: chat });
     setCurrentChat(chat);
   };
+  const startNewChat = async () => {
+    try {
+      const res = await instance.post("/api/v1/createNewChats", { chatTitle });
+      console.log(res);
+      getChats();
+    } catch (error) {
+      console.log(error, "error");
+    }
+  };
   useEffect(() => {
     getChats();
   }, []);
@@ -28,6 +38,9 @@ const Chat_Page = () => {
           chats={chats}
           changeChat={changeChat}
           currentChat={currentChat}
+          startNewChat={startNewChat}
+          chatTitle={chatTitle}
+          setChatTitle={setChatTitle}
         />
         <Chat chat={currentChat} />
       </div>
