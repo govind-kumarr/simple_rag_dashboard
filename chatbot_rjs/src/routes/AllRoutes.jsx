@@ -76,6 +76,16 @@ const AllRoutes = () => {
           </ProtectedRoute>
         }
       />
+      <Route
+        path="/train-ai"
+        element={
+          <ProtectedRoute>
+            <DashboardLayout>
+              <h1>Add instructions</h1>
+            </DashboardLayout>
+          </ProtectedRoute>
+        }
+      />
       <Route path="/verify-email" element={<EmailVerification />} />
       <Route path="/logout" element={<Logout />} />
       <Route path="/signin" element={<SignIn />} />
