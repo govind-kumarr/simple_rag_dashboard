@@ -8,7 +8,7 @@ const Sidebar = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [percentConsumed, setPercentConsumed] = useState(0);
-  const [userInfo, setUserInfo] = useState({}); // Initialize userInfo as an object
+  const [userInfo, setUserInfo] = useState({});
   const getMemoryInfo = async () => {
     try {
       const res = await instance.get("/api/v1/memory-info");
@@ -31,7 +31,7 @@ const Sidebar = () => {
         {},
         { withCredentials: true }
       );
-      setUserInfo(res.data.user); // Set userInfo state here
+      setUserInfo(res.data.user);
       return res.data.user;
     } catch (error) {
       console.error("Error fetching user details:", error);
@@ -39,7 +39,7 @@ const Sidebar = () => {
   };
   useEffect(() => {
     getMemoryInfo();
-    getUserDetails(); // No need to assign to a variable
+    getUserDetails();
   }, []);
 
   const handleVerifyEmail = () => {
