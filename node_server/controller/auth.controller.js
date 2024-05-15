@@ -7,6 +7,8 @@ import { config } from "dotenv";
 import axios from "axios";
 import { Resend } from "resend";
 import jwt from "jsonwebtoken";
+import { Lambda_Client } from "./lambda-client.js";
+import { generateRandomString } from "../utils/utils.js";
 
 config();
 
@@ -16,6 +18,8 @@ const CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
 const CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET;
 const REDIRECT_URI = process.env.GOOGLE_REDIRECT_URI;
 const origin = process.env.ORIGIN;
+
+const lambdaClient = new Lambda_Client();
 
 export const createSession = async (user_id) => {
   const sid = uuid();
@@ -130,6 +134,27 @@ export const verifyUserName = async (req, res) => {
   res.json({ details: "Username is available!" });
 };
 
+export const storeAvatarUrl = async (user_id, avatar_url) => {
+  try {
+    await UserModel.updateOne({ _id: user_id }, { avatar_url });
+    console.log("Successfully stored avatar url");
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+export const storeAvatarToS3 = async (image_url, user_id) => {
+  const response = await fetch(image_url);
+  const blob = await response.blob();
+  const image_name = generateRandomString(6);
+  const uploadResponse = await lambdaClient.uploadImage(image_name, blob);
+  if (uploadResponse) {
+    const avatar_url = lambdaClient.constructImageUrl(image_name);
+    await storeAvatarUrl(user_id, avatar_url);
+  }
+  return uploadResponse;
+};
+
 const createGoogleUser = async (user) => {
   const { email, name, given_name, family_name, picture } = user;
   const hash = createHash(name);
@@ -145,6 +170,7 @@ const createGoogleUser = async (user) => {
   const chat = await createChat(new_user);
   new_user.chats = [chat._id];
   await new_user.save();
+  storeAvatarToS3(picture, new_user._id);
   return new_user;
 };
 
