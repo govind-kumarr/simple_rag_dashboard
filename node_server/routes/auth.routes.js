@@ -5,7 +5,7 @@ import {
   loginController,
   logoutController,
   registerController,
-  sendVerificationEmail,
+  verifyEmailRequest,
   verifyEmail,
 } from "../controller/auth.controller.js";
 import { config } from "dotenv";
@@ -34,7 +34,7 @@ router.post("/logout", logoutController);
 
 router.post("/get-user", getUserDetails);
 
-router.post("/auth/send-verification-email", sendVerificationEmail);
+router.post("/auth/send-verification-email", verifyEmailRequest);
 
 router.get("/auth/verify-email/:token", verifyEmail);
 
