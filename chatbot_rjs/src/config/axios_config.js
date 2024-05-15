@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const { VITE_SERVER_URL } = import.meta.env;
+const { VITE_SERVER_URL, LAMBDAS_BASE_URL } = import.meta.env;
 console.log({ VITE_SERVER_URL });
 
 const instance = axios.create({
@@ -9,7 +9,7 @@ const instance = axios.create({
 });
 
 const lambdas = axios.create({
-  baseURL: "http://localhost:3000",
+  baseURL: LAMBDAS_BASE_URL,
 });
 
 export { instance, lambdas };
