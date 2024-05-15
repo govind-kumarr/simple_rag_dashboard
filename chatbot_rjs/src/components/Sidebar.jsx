@@ -1,43 +1,53 @@
 import React, { useEffect, useState } from "react";
 import SidebarItem from "./SidebarItem";
 import { sidebarItems } from "../assets/sidebarItems";
-import { Navigate, useLocation } from "react-router-dom";
 import { instance } from "../config/axios_config";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 
 const Sidebar = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [percentConsumed, setPercentConsumed] = useState(0);
+  const [userInfo, setUserInfo] = useState({}); // Initialize userInfo as an object
   const getMemoryInfo = async () => {
-    const res = await instance.get("/api/v1/memory-info");
-    if (res.status === 200 && res.statusText === "OK") {
-      const { data } = res;
-      const {
-        details: { memoryConsumed, totalLimit },
-      } = data;
-      const percentConsumed = (memoryConsumed / totalLimit) * 100;
-      setPercentConsumed(Math.ceil(percentConsumed));
+    try {
+      const res = await instance.get("/api/v1/memory-info");
+      if (res.status === 200 && res.statusText === "OK") {
+        const { data } = res;
+        const {
+          details: { memoryConsumed, totalLimit },
+        } = data;
+        const percentConsumed = (memoryConsumed / totalLimit) * 100;
+        setPercentConsumed(Math.ceil(percentConsumed));
+      }
+    } catch (error) {
+      console.error("Error fetching memory info:", error);
+    }
+  };
+  const getUserDetails = async () => {
+    try {
+      const res = await instance.post(
+        "/get-user",
+        {},
+        { withCredentials: true }
+      );
+      setUserInfo(res.data.user); // Set userInfo state here
+      return res.data.user;
+    } catch (error) {
+      console.error("Error fetching user details:", error);
     }
   };
   useEffect(() => {
     getMemoryInfo();
+    getUserDetails(); // No need to assign to a variable
   }, []);
-  const handleVerifyEmail = async () => {
-    const res = await instance.post(
-      "/api/v1/get-user",
-      {},
-      {
-        withCredentials: true,
-      }
-    );
-    console.log(res);
-    if (res.data.email_verified) {
-      if (res.status === 200 && res.statusText === "OK") {
-        navigate("/verify-email");
-      }
+
+  const handleVerifyEmail = () => {
+    if (!userInfo.email_verified) {
+      navigate("/verify-email");
     }
   };
+
   return (
     <aside
       id="logo-sidebar"
@@ -63,12 +73,14 @@ const Sidebar = () => {
               ></div>
             </div>
           </li>
-          <button
-            className="bg-[#1E40B0] text-white px-4 py-2 rounded-md"
-            onClick={() => handleVerifyEmail()}
-          >
-            Verify Email
-          </button>
+          {!userInfo.email_verified && (
+            <button
+              className="bg-[#1E40B0] text-white px-4 py-2 rounded-md"
+              onClick={handleVerifyEmail}
+            >
+              Verify Email
+            </button>
+          )}
         </ul>
       </div>
     </aside>

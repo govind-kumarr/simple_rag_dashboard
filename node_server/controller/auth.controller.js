@@ -52,6 +52,8 @@ export const loginController = async (req, res) => {
 export const verifyEmailRequest = async (req, res) => {
   const email = req.body.email;
   const existingUser = await UserModel.findOne({ email });
+  if (!existingUser)
+    return res.json({ details: "No user found! Please send valid email" });
   if (existingUser.email_verified)
     return res.json({ details: "Email already verified!" });
   if (!existingUser)
