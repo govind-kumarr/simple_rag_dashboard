@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import crypto from "crypto";
 
 const UserSchema = mongoose.Schema(
   {
@@ -30,11 +31,28 @@ const UserSchema = mongoose.Schema(
       type: String,
       default: "local",
     },
-    verfication_token: {
+    email_verfication_token: {
       type: String,
     },
+    email_verfication_expiry: {
+      type: Date
+    }
   },
   { timestamps: true }
 );
+
+UserSchema.methods.generateTemporaryToken = function(){
+  const unHashToken = crypto.randomBytes(20).toString('hex');
+
+  const hashedToken = crypto
+                        .createHash('sha256')
+                        .update(unHashToken)
+                        .digest('hex');
+
+  const tokenExpiry = Date.now() + 5*60*1000;//5 min
+
+  return {unHashToken, hashedToken, tokenExpiry};
+}
+
 
 export const UserModel = mongoose.model("users", UserSchema);

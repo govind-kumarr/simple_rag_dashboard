@@ -26,6 +26,7 @@ app.use(
 
 app.use(cookieParser());
 app.use(express.json());
+app.use(express.urlencoded({extended: true}))
 app.use(extractIP);
 //mongo sanitize setup
 app.use(ExpressMongoSanitize())
