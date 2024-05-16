@@ -1,10 +1,11 @@
 import { Router } from "express";
 import {
+  getUserDetails,
   googleAuthCallback,
   loginController,
   logoutController,
   registerController,
-  sendVerificationEmail,
+  verifyEmailRequest,
   verifyEmail,
 } from "../controller/auth.controller.js";
 import { config } from "dotenv";
@@ -29,7 +30,11 @@ router.post("/auth/login", loginController);
 
 router.post("/logout", logoutController);
 
-router.post("/auth/send-verification-email", sendVerificationEmail);
+// create route to get all the details of the user this is useful for checking is user verified email or not
+
+router.post("/get-user", getUserDetails);
+
+router.post("/auth/send-verification-email", verifyEmailRequest);
 
 router.get("/auth/verify-email/:token", verifyEmail);
 
