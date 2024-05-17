@@ -1,7 +1,48 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import Logo from "../components/Logo";
+import { instance } from "../config/axios_config";
+import { toast } from "react-toastify";
 
 const EmailVerification = () => {
+  const [userInfo, setUserInfo] = useState({});
+  const [verificationSent, setVerificationSent] = useState(false); // State variable to track if verification email has been sent
+  const [sendingVerification, setSendingVerification] = useState(false); // State variable to track if verification email is being sent
+
+  const getUserDetails = async () => {
+    try {
+      const res = await instance.post(
+        "/get-user",
+        {},
+        { withCredentials: true }
+      );
+      setUserInfo(res.data.user);
+    } catch (error) {
+      console.error("Error fetching user details:", error);
+    }
+  };
+
+  useEffect(() => {
+    getUserDetails();
+  }, []);
+
+  const handleVerification = async () => {
+    if (sendingVerification) return; // Prevent multiple clicks while verification is in progress
+    try {
+      setSendingVerification(true);
+      const res = await instance.post(
+        "/auth/send-verification-email",
+        { email: userInfo.email },
+        { withCredentials: true }
+      );
+      setVerificationSent(true);
+      toast.success("Verification email sent successfully!");
+    } catch (error) {
+      console.error("Error sending verification email:", error);
+    } finally {
+      setSendingVerification(false);
+    }
+  };
+
   return (
     <div>
       <section className="bg-gray-50 dark:bg-gray-900">
@@ -10,21 +51,10 @@ const EmailVerification = () => {
           <div className="w-full p-6 bg-white rounded-lg shadow dark:border md:mt-0 sm:max-w-md dark:bg-gray-800 dark:border-gray-700 sm:p-8">
             <div className="flex justify-center gap-2 items-center my-2 mt-0">
               <div className="-mt-1">
-                <svg
-                  class="w-6 h-6 text-gray-800 dark:text-white"
-                  aria-hidden="true"
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="24"
-                  height="24"
-                  fill="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path d="m3.62 6.389 8.396 6.724 8.638-6.572-7.69-4.29a1.975 1.975 0 0 0-1.928 0L3.62 6.39Z" />
-                  <path d="m22 8.053-8.784 6.683a1.978 1.978 0 0 1-2.44-.031L2.02 7.693a1.091 1.091 0 0 0-.019.199v11.065C2 20.637 3.343 22 5 22h14c1.657 0 3-1.362 3-3.043V8.053Z" />
-                </svg>
+                <img src="/verification.svg" alt="" />
               </div>
               <h1 className=" text-center text-xl font-bold leading-tight tracking-tight text-gray-900 md:text-2xl dark:text-white">
-                Email Vefification
+                Email Verification
               </h1>
             </div>
 
@@ -37,13 +67,19 @@ const EmailVerification = () => {
               className="mt-4 space-y-4 lg:mt-5 md:space-y-5"
               onSubmit={(e) => {
                 e.preventDefault();
+                handleVerification();
               }}
             >
               <button
                 type="submit"
                 className="w-full text-white bg-primary-600 hover:bg-primary-700 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
+                disabled={verificationSent || sendingVerification}
               >
-                <a href="mailto:gk4051668@gmail.com">Verify now</a>
+                {sendingVerification
+                  ? "Sending..."
+                  : verificationSent
+                  ? "Verification Sent"
+                  : "Verify now"}
               </button>
             </form>
           </div>

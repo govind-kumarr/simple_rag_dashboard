@@ -1,26 +1,53 @@
 import React, { useEffect, useState } from "react";
 import SidebarItem from "./SidebarItem";
 import { sidebarItems } from "../assets/sidebarItems";
-import { useLocation } from "react-router-dom";
 import { instance } from "../config/axios_config";
+import { useNavigate, useLocation } from "react-router-dom";
 
 const Sidebar = () => {
+  const navigate = useNavigate();
   const location = useLocation();
   const [percentConsumed, setPercentConsumed] = useState(0);
+  const [userInfo, setUserInfo] = useState({});
   const getMemoryInfo = async () => {
-    const res = await instance.get("/api/v1/memory-info");
-    if (res.status === 200 && res.statusText === "OK") {
-      const { data } = res;
-      const {
-        details: { memoryConsumed, totalLimit },
-      } = data;
-      const percentConsumed = (memoryConsumed / totalLimit) * 100;
-      setPercentConsumed(Math.ceil(percentConsumed));
+    try {
+      const res = await instance.get("/api/v1/memory-info");
+      if (res.status === 200 && res.statusText === "OK") {
+        const { data } = res;
+        const {
+          details: { memoryConsumed, totalLimit },
+        } = data;
+        const percentConsumed = (memoryConsumed / totalLimit) * 100;
+        setPercentConsumed(Math.ceil(percentConsumed));
+      }
+    } catch (error) {
+      console.error("Error fetching memory info:", error);
+    }
+  };
+  const getUserDetails = async () => {
+    try {
+      const res = await instance.post(
+        "/get-user",
+        {},
+        { withCredentials: true }
+      );
+      setUserInfo(res.data.user);
+      return res.data.user;
+    } catch (error) {
+      console.error("Error fetching user details:", error);
     }
   };
   useEffect(() => {
     getMemoryInfo();
+    getUserDetails();
   }, []);
+
+  const handleVerifyEmail = () => {
+    if (!userInfo.email_verified) {
+      navigate("/verify-email");
+    }
+  };
+
   return (
     <aside
       id="logo-sidebar"
@@ -46,6 +73,14 @@ const Sidebar = () => {
               ></div>
             </div>
           </li>
+          {!userInfo.email_verified && (
+            <button
+              className="bg-[#1E40B0] text-white px-4 py-2 rounded-md"
+              onClick={handleVerifyEmail}
+            >
+              Verify Email
+            </button>
+          )}
         </ul>
       </div>
     </aside>
