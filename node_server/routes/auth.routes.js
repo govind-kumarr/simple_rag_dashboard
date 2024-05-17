@@ -36,7 +36,7 @@ router.post("/get-user", getUserDetails);
 
 router.post("/auth/send-verification-email", verifyEmailRequest);
 
-router.get("/auth/verify-email/:token", verifyEmail);
+router.get("/auth/verify-email/:userId/:verificationToken", verifyEmail);
 
 router.post("/auth/register", registerController);
 

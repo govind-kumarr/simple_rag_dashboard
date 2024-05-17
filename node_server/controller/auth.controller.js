@@ -5,10 +5,10 @@ import { createHash, isValidPassword } from "../utils/authUtils.js";
 import { ChatModel } from "../models/Chat.model.js";
 import { config } from "dotenv";
 import axios from "axios";
+import crypto from "crypto";
 import jwt from "jsonwebtoken";
-import { sendVerificationEmail } from "../utils/VerfiyEmail.js";
-import { Lambda_Client } from "./lambda-client.js";
-import { generateRandomString } from "../utils/utils.js";
+import { sendEmail } from "../utils/sendEmail/index.js";
+import { verifyEmailTemplate } from "../utils/sendEmail/Templates/verifyEmailTemplate.js";
 
 config();
 
@@ -49,45 +49,62 @@ export const loginController = async (req, res) => {
   res.json({ details: "Login Success!" });
 };
 
-export const verifyEmailRequest = async (req, res) => {
-  const email = req.body.email;
-  const existingUser = await UserModel.findOne({ email });
-  if (!existingUser)
-    return res.json({ details: "No user found! Please send valid email" });
-  if (existingUser.email_verified)
-    return res.json({ details: "Email already verified!" });
-  if (!existingUser)
-    return res.json({ details: "No user find with this email!" });
+export const sendVerificationEmail = async (req, res) => {
+  try{
+    const email = req.body.email;
+    const user = await UserModel.findOne({ email });
+    if (!user)
+      return res.json({ message: "No user find with this email!", succes: false });
+  
+    
+    const {hashedToken, unHashToken, tokenExpiry} = UserModel.generateTemporaryToken();
+  
+    user.email_verfication_token = hashedToken;
+    user.email_verfication_expiry = tokenExpiry;
+    await user.save();
 
-  const token = jwt.sign({ email }, process.env.JWT_SECRET, {
-    expiresIn: "1d",
-  });
-
-  existingUser.verfication_token = token;
-  await existingUser.save();
-
-  const user = await sendVerificationEmail(email, token);
-  res.cookie("token", token, {
-    httpOnly: true,
-    secure: NOD_ENV === "PROD",
-    sameSite: NOD_ENV === "PROD" ? "none" : "lax",
-    expires: new Date(Date.now() + 24 * 60 * 60 * 1000),
-  });
-
-  console.log("Email Sent!", user);
-  res.json({ details: "Verification Email Sent!", user: existingUser, token });
+    await sendEmail({
+      email: email,
+      subject: "Email Verification",
+      text: verifyEmailTemplate(`${process.env.ORIGIN}/auth/verify-email/${user._id}/${unHashToken}`),
+    });
+    
+    res.json({ message: "Verification Email Sent!", success: true });
+  }
+  catch(err){
+    console.log(err)
+    return res.status(500).json({message: "Something went wrong", success: false});
+  }
 };
 
 export const verifyEmail = async (req, res) => {
-  const token = req.params.token;
-  const decoded = jwt.verify(token, process.env.JWT_SECRET);
-  const User = await UserModel.findOne({ email: decoded.email });
-  if (!User) return res.json({ details: "No user found!" });
-  User.email_verified = true;
-  await User.save();
+  try{
+    const { userId, verificationToken } = req.params;
+    const user = await UserModel.findById(userId);
+  
+    if (!user) return res.status(400).json({ message: "No user found!", success: false });
 
-  console.log("Email Verified!");
-  res.redirect(process.env.REDIRECT_URL);
+    const hashedToken = crypto
+                          .createHash('sha256')
+                          .update(verificationToken)
+                          .digest('hex');
+    
+  
+    if((hashedToken !== user.email_verfication_token) || (Date.now() > user.email_verfication_expiry)){
+      return res.status(401).json({ message: "Credentials invalid", success: false });
+    }
+  
+    user.email_verified = true;
+    user.email_verfication_expiry = undefined;
+    user.email_verfication_token = undefined;
+    await user.save();
+  
+    return res.status(200).json({message: "Email verified", success: true});
+  }
+  catch(err){
+    console.log(err);
+    return res.status(500).json({messages: "Something went wrong", success: false})
+  }
 };
 
 export const logoutController = async (req, res) => {
