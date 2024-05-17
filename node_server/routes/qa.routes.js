@@ -3,6 +3,7 @@ import { QA_Manager } from "../controller/qa.controller.js";
 import { UserModel } from "../models/User.model.js";
 import { MessageModel } from "../models/Message.model.js";
 import { ChatModel } from "../models/Chat.model.js";
+import { messageSchema } from "../joi_validation/validation.schema.js";
 
 const router = Router();
 
@@ -54,7 +55,7 @@ const saveMessageToChat = async (chatId, message) => {
   }
 };
 
-router.post("/ask", getUserInfo, async (req, res) => {
+router.post("/ask", getUserInfo,messageSchema, async (req, res) => {
   const { question, chatId } = req.body;
   const newMessage = await createUserMessage(question, req.user.id);
   await saveMessageToChat(chatId, newMessage);
