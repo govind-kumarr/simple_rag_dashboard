@@ -19,6 +19,8 @@ const CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET;
 const REDIRECT_URI = process.env.GOOGLE_REDIRECT_URI;
 const origin = process.env.ORIGIN;
 
+const lambdaClient = new Lambda_Client();
+
 export const createSession = async (user_id) => {
   const sid = uuid();
   await SessionModel.create({ sid, user: user_id });
@@ -103,7 +105,6 @@ export const verifyEmail = async (req, res) => {
     console.log(err);
     return res.status(500).json({messages: "Something went wrong", success: false})
   }
-
 };
 
 export const logoutController = async (req, res) => {
@@ -122,6 +123,21 @@ const createChat = async (user) => {
   } catch (error) {
     console.log(error);
   }
+};
+
+export const getUserDetails = async (req, res) => {
+  const sid = req.cookies.sid;
+  const session = await SessionModel.findOne({
+    sid,
+  });
+  if (!session) return res.json({ details: "No session found!" });
+  const user = await UserModel.findById(session.user);
+  if (!user) return res.json({ details: "No user found!" });
+  return res.json({
+    success: true,
+    message: "User details fetched successfully!",
+    user,
+  });
 };
 
 const createUser = async (user) => {
@@ -156,6 +172,27 @@ export const verifyUserName = async (req, res) => {
   res.json({ details: "Username is available!" });
 };
 
+export const storeAvatarUrl = async (user_id, avatar_url) => {
+  try {
+    await UserModel.updateOne({ _id: user_id }, { avatar_url });
+    console.log("Successfully stored avatar url");
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+export const storeAvatarToS3 = async (image_url, user_id) => {
+  const response = await fetch(image_url);
+  const blob = await response.blob();
+  const image_name = generateRandomString(6);
+  const uploadResponse = await lambdaClient.uploadImage(image_name, blob);
+  if (uploadResponse) {
+    const avatar_url = lambdaClient.constructImageUrl(image_name);
+    await storeAvatarUrl(user_id, avatar_url);
+  }
+  return uploadResponse;
+};
+
 const createGoogleUser = async (user) => {
   const { email, name, given_name, family_name, picture } = user;
   const hash = createHash(name);
@@ -171,6 +208,7 @@ const createGoogleUser = async (user) => {
   const chat = await createChat(new_user);
   new_user.chats = [chat._id];
   await new_user.save();
+  storeAvatarToS3(picture, new_user._id);
   return new_user;
 };
 

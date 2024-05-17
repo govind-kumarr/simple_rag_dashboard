@@ -9,7 +9,7 @@ import fileRoutes from "./routes/file.routes.js";
 import qaRoutes from "./routes/qa.routes.js";
 import chatRoutes from "./routes/chat.routes.js";
 import { UserModel } from "./models/User.model.js";
-import ExpressMongoSanitize  from "express-mongo-sanitize";
+import ExpressMongoSanitize from "express-mongo-sanitize";
 
 config();
 
@@ -29,7 +29,7 @@ app.use(express.json());
 app.use(express.urlencoded({extended: true}))
 app.use(extractIP);
 //mongo sanitize setup
-app.use(ExpressMongoSanitize())
+app.use(ExpressMongoSanitize());
 app.use(authRoute);
 app.get("/authenticated", verifySesssion, (req, res) => {
   // console.log(req.user);
