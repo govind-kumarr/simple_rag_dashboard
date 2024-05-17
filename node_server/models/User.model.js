@@ -41,7 +41,7 @@ const UserSchema = mongoose.Schema(
   { timestamps: true }
 );
 
-UserSchema.methods.generateTemporaryToken = function(){
+UserSchema.statics.generateTemporaryToken = function(){
   const unHashToken = crypto.randomBytes(20).toString('hex');
 
   const hashedToken = crypto

@@ -1,6 +1,6 @@
 import nodemailer from "nodemailer";
 
-export const sendEmail = async(email, subject, text)=>{
+export const sendEmail = async({email, subject, text})=>{
     const transport = nodemailer.createTransport({
         host: process.env.MAIL_HOST,
         port: process.env.MAIL_PORT,
@@ -12,12 +12,13 @@ export const sendEmail = async(email, subject, text)=>{
     })
     
     try{
-        await transport.sendMail({
+        const user = await transport.sendMail({
             from: "Simple Rag DashBoard",
             to: email,
             subject: subject,
-            text: text
+            html: text
         })
+        console.log("Email sent successfully")
     }
     catch(error){
         console.log(error)

@@ -5,8 +5,10 @@ import { createHash, isValidPassword } from "../utils/authUtils.js";
 import { ChatModel } from "../models/Chat.model.js";
 import { config } from "dotenv";
 import axios from "axios";
-import { Resend } from "resend";
+import crypto from "crypto";
 import jwt from "jsonwebtoken";
+import { sendEmail } from "../utils/sendEmail/index.js";
+import { verifyEmailTemplate } from "../utils/sendEmail/Templates/verifyEmailTemplate.js";
 
 config();
 
@@ -46,38 +48,62 @@ export const loginController = async (req, res) => {
 };
 
 export const sendVerificationEmail = async (req, res) => {
-  const email = req.body.email;
-  const existingUser = await UserModel.findOne({ email });
-  if (!existingUser)
-    return res.json({ details: "No user find with this email!" });
+  try{
+    const email = req.body.email;
+    const user = await UserModel.findOne({ email });
+    if (!user)
+      return res.json({ message: "No user find with this email!", succes: false });
+  
+    
+    const {hashedToken, unHashToken, tokenExpiry} = UserModel.generateTemporaryToken();
+  
+    user.email_verfication_token = hashedToken;
+    user.email_verfication_expiry = tokenExpiry;
+    await user.save();
 
-  const token = jwt.sign({ email }, process.env.JWT_SECRET, {
-    expiresIn: "1d",
-  });
-
-  existingUser.verfication_token = token;
-  await existingUser.save();
-
-  const resend = new Resend(process.env.RESEND_API_KEY);
-  const user = await resend.emails.send({
-    from: "onboarding@resend.dev",
-    to: email,
-    subject: "Hello World",
-    html: `<style>body {font-family: Arial, sans-serif;margin: 0;padding: 0;background-color: #f5f5f5;}.container {max-width: 600px;margin: 20px auto;padding: 20px;background-color: #fff;border-radius: 8px;box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);}h1 {color: #333;}p {color: #666;}.button {display: inline-block;padding: 10px 20px;background-color: #007bff;color: #fff;text-decoration: none;border-radius: 5px;transition: background-color 0.3s;}.button:hover {background-color: #0056b3;}</style><body><div class="container"><h1>Email Verification</h1><p>Congratulations on signing up!</p><p>Please click the button below to verify your email address.</p><a href="${process.env.BACKEND_BASE_URL}/auth/verify-email/${token}" class="button">Verify Email</a><p>If you didn't sign up for an account, you can safely ignore this email.</p></div></body>`,
-  });
-  res.json({ details: "Verification Email Sent!", user: existingUser, token });
+    await sendEmail({
+      email: email,
+      subject: "Email Verification",
+      text: verifyEmailTemplate(`${process.env.ORIGIN}/auth/verify-email/${user._id}/${unHashToken}`),
+    });
+    
+    res.json({ message: "Verification Email Sent!", success: true });
+  }
+  catch(err){
+    console.log(err)
+    return res.status(500).json({message: "Something went wrong", success: false});
+  }
 };
 
 export const verifyEmail = async (req, res) => {
-  const { token } = req.params;
-  const decoded = jwt.verify(token, process.env.JWT_SECRET);
-  const User = await UserModel.findOne({ email: decoded.email });
-  if (!User) return res.json({ details: "No user found!" });
-  User.email_verified = true;
-  await User.save();
+  try{
+    const { userId, verificationToken } = req.params;
+    const user = await UserModel.findById(userId);
+  
+    if (!user) return res.status(400).json({ message: "No user found!", success: false });
 
-  console.log("Email Verified!");
-  res.redirect(process.env.REDIRECT_URL);
+    const hashedToken = crypto
+                          .createHash('sha256')
+                          .update(verificationToken)
+                          .digest('hex');
+    
+  
+    if((hashedToken !== user.email_verfication_token) || (Date.now() > user.email_verfication_expiry)){
+      return res.status(401).json({ message: "Credentials invalid", success: false });
+    }
+  
+    user.email_verified = true;
+    user.email_verfication_expiry = undefined;
+    user.email_verfication_token = undefined;
+    await user.save();
+  
+    return res.status(200).json({message: "Email verified", success: true});
+  }
+  catch(err){
+    console.log(err);
+    return res.status(500).json({messages: "Something went wrong", success: false})
+  }
+
 };
 
 export const logoutController = async (req, res) => {
