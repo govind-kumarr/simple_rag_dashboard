@@ -317,3 +317,62 @@ export const createNewChats = async (req, res) => {
     });
   }
 };
+
+export const updateUserInfo = async (req, res) => {
+  try {
+    const userId = req.user.user;
+    const { firstName, lastName, userName, email, avatar } =
+      req.body.userGeneralDetails;
+    const userDetails = await UserModel.findById(userId);
+    userDetails.username = userName;
+    if (firstName || lastName) {
+      userDetails.full_name = firstName + " " + lastName;
+    }
+    if (userName) {
+      userDetails.username = userName;
+    }
+    if (email) {
+      userDetails.email = email;
+    }
+    if (avatar) {
+      userDetails.avatar_url = avatar;
+    }
+    await userDetails.save();
+    res.json({
+      message: "user details updated success",
+    });
+  } catch (error) {
+    res.json({
+      message: error,
+    });
+  }
+};
+
+export const updateUserPassword = async (req, res) => {
+  try {
+    const userId = req.user.user;
+    const userDetails = await UserModel.findById(userId);
+    const { currentPassword, newPassword } = req.body.userPassword;
+    const user = { password: userDetails.password };
+    if (currentPassword && newPassword) {
+      // check current pass match with db
+      const passwordMatch = await isValidPassword(user, currentPassword);
+
+      console.log(passwordMatch, "password");
+      if (!passwordMatch) {
+        return res.end("current password did not matched");
+      }
+
+      const hash = await createHash(newPassword);
+      userDetails.password = hash;
+    }
+    await userDetails.save();
+    res.status(200).json({
+      message: "password updated successfully",
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: "something went wrong",
+    });
+  }
+};

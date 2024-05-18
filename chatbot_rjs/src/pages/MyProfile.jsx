@@ -17,14 +17,15 @@ const MyProfile = () => {
 
   const getUserInfo = async () => {
     try {
-      const res = await instance.get("/auth/get-details");
-      console.log(res.data.userDetails.username);
+      const res = await instance.get("/get-user");
+      console.log(res.data.user);
+      let full = res.data.user.full_name.split(" ");
       setUserGeneralDetails({
-        userName: res.data.userDetails.username || " ",
-        firstName: res.data.userDetails.full_name || " ",
-        lastName: res.data.userDetails.full_name || " ",
-        email: res.data.userDetails.email || " ",
-        avatar: res.data.userDetails.avatar_url || " ",
+        userName: res.data.user.username || " ",
+        firstName: full[1] || " ",
+        lastName: full[2] || " ",
+        email: res.data.user.email || " ",
+        avatar: res.data.user.avatar_url || " ",
       });
       console.log(res, "res");
     } catch (error) {

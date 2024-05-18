@@ -9,6 +9,7 @@ const UserSchema = mongoose.Schema(
     },
     full_name: {
       type: String,
+      default: "",
     },
     password: {
       type: String,
@@ -35,24 +36,23 @@ const UserSchema = mongoose.Schema(
       type: String,
     },
     email_verfication_expiry: {
-      type: Date
-    }
+      type: Date,
+    },
   },
   { timestamps: true }
 );
 
-UserSchema.statics.generateTemporaryToken = function(){
-  const unHashToken = crypto.randomBytes(20).toString('hex');
+UserSchema.statics.generateTemporaryToken = function () {
+  const unHashToken = crypto.randomBytes(20).toString("hex");
 
   const hashedToken = crypto
-                        .createHash('sha256')
-                        .update(unHashToken)
-                        .digest('hex');
+    .createHash("sha256")
+    .update(unHashToken)
+    .digest("hex");
 
-  const tokenExpiry = Date.now() + 5*60*1000;//5 min
+  const tokenExpiry = Date.now() + 5 * 60 * 1000; //5 min
 
-  return {unHashToken, hashedToken, tokenExpiry};
-}
-
+  return { unHashToken, hashedToken, tokenExpiry };
+};
 
 export const UserModel = mongoose.model("users", UserSchema);
