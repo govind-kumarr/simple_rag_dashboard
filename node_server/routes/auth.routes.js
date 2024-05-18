@@ -6,9 +6,12 @@ import {
   logoutController,
   registerController,
   sendVerificationEmail,
+  updateUserInfo,
+  updateUserPassword,
   verifyEmail,
 } from "../controller/auth.controller.js";
 import { config } from "dotenv";
+import { verifySesssion } from '../middlewares/auth.middleware.js';
 
 config();
 
@@ -31,7 +34,7 @@ router.post("/logout", logoutController);
 
 // create route to get all the details of the user this is useful for checking is user verified email or not
 
-router.post("/get-user", getUserDetails);
+router.get("/get-user", getUserDetails);
 
 router.post("/auth/send-verification-email", sendVerificationEmail);
 
@@ -39,4 +42,6 @@ router.get("/auth/verify-email/:userId/:verificationToken", verifyEmail);
 
 router.post("/auth/register", registerController);
 
+router.put("/auth/update-details", verifySesssion, updateUserInfo);
+router.put("/auth/update-pass", verifySesssion, updateUserPassword);
 export default router;
