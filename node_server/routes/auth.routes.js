@@ -5,11 +5,10 @@ import {
   loginController,
   logoutController,
   registerController,
-  verifyEmailRequest,
+  sendVerificationEmail,
   verifyEmail,
 } from "../controller/auth.controller.js";
 import { config } from "dotenv";
-import axios from "axios";
 
 config();
 
@@ -34,7 +33,7 @@ router.post("/logout", logoutController);
 
 router.post("/get-user", getUserDetails);
 
-router.post("/auth/send-verification-email", verifyEmailRequest);
+router.post("/auth/send-verification-email", sendVerificationEmail);
 
 router.get("/auth/verify-email/:userId/:verificationToken", verifyEmail);
 

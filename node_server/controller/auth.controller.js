@@ -6,9 +6,9 @@ import { ChatModel } from "../models/Chat.model.js";
 import { config } from "dotenv";
 import axios from "axios";
 import crypto from "crypto";
-import jwt from "jsonwebtoken";
 import { sendEmail } from "../utils/sendEmail/index.js";
 import { verifyEmailTemplate } from "../utils/sendEmail/Templates/verifyEmailTemplate.js";
+import { Lambda_Client } from "./lambda-client.js";
 
 config();
 
