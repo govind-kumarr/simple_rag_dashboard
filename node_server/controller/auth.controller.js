@@ -9,6 +9,7 @@ import crypto from "crypto";
 import { sendEmail } from "../utils/sendEmail/index.js";
 import { verifyEmailTemplate } from "../utils/sendEmail/Templates/verifyEmailTemplate.js";
 import { Lambda_Client } from "./lambda-client.js";
+import { generateRandomString } from "../utils/utils.js";
 
 config();
 
