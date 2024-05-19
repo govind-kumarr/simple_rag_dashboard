@@ -10,11 +10,8 @@ const EmailVerification = () => {
 
   const getUserDetails = async () => {
     try {
-      const res = await instance.post(
-        "/get-user",
-        {},
-        { withCredentials: true }
-      );
+      const res = await instance.get("/get-user");
+      console.log("email-verification-page", { userDetails: res.data });
       setUserInfo(res.data.user);
     } catch (error) {
       console.error("Error fetching user details:", error);
