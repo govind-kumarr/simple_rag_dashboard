@@ -13,6 +13,7 @@ import AllAvatars from "../pages/avatar_management/Avatars.jsx";
 import ProtectedRoute from "../components/ProtectedRoute";
 import DashboardLayout from "../components/DashboardLayout";
 import EmailVerification from "../pages/EmailVerification.jsx";
+import TrainAi from "../pages/TrainAi.jsx";
 
 function Logout() {
   const navigate = useNavigate();
@@ -81,7 +82,7 @@ const AllRoutes = () => {
         element={
           <ProtectedRoute>
             <DashboardLayout>
-              <h1>Add instructions</h1>
+              <TrainAi />
             </DashboardLayout>
           </ProtectedRoute>
         }
