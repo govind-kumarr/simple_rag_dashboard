@@ -9,6 +9,26 @@ const SessionSchema = mongoose.Schema(
     user: {
       type: "Object",
     },
+    ip: {
+      type: "String",
+    },
+    browser: {
+      type: "String",
+    },
+    os: {
+      type: "String",
+    },
+    platform: {
+      type: "String",
+    },
+    loginTime: {
+      type: "String",
+      default: new Date().toISOString(),
+    },
+    isRevoked: {
+      type: "Boolean",
+      default: false,
+    },
   },
   { timestamps: true }
 );

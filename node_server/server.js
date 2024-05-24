@@ -3,13 +3,14 @@ import cors from "cors";
 import cookieParser from "cookie-parser";
 import { config } from "dotenv";
 import { connectToDb } from "./db/db.js";
-import { verifySesssion, extractIP } from "./middlewares/auth.middleware.js";
+import { verifySesssion } from "./middlewares/auth.middleware.js";
 import authRoute from "./routes/auth.routes.js";
 import fileRoutes from "./routes/file.routes.js";
 import qaRoutes from "./routes/qa.routes.js";
 import chatRoutes from "./routes/chat.routes.js";
 import { UserModel } from "./models/User.model.js";
 import ExpressMongoSanitize from "express-mongo-sanitize";
+import * as useragent from "express-useragent";
 
 config();
 
@@ -24,10 +25,10 @@ app.use(
   })
 );
 
+app.use(useragent.express());
 app.use(cookieParser());
 app.use(express.json());
-app.use(express.urlencoded({extended: true}))
-app.use(extractIP);
+app.use(express.urlencoded({ extended: true }));
 //mongo sanitize setup
 app.use(ExpressMongoSanitize());
 app.use(authRoute);

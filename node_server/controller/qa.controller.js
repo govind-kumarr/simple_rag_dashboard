@@ -9,13 +9,10 @@ import { getVectorStore } from "./chroma.controllers.js";
 import { BufferMemory, ChatMessageHistory } from "langchain/memory";
 import { HumanMessage, AIMessage } from "langchain/schema";
 import { ChatModel } from "../models/Chat.model.js";
-import { connectToDb } from "../db/db.js";
 
 config();
 
-const chromaUrl = process.env.CHROMA_URL;
 const openAIApiKey = process.env.OPENAI_API_KEY;
-const client = new ChromaClient({ path: chromaUrl });
 
 export class QA_Manager {
   constructor(collectionName) {

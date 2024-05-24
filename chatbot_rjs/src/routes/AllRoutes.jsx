@@ -13,6 +13,7 @@ import AllAvatars from "../pages/avatar_management/Avatars.jsx";
 import ProtectedRoute from "../components/ProtectedRoute";
 import DashboardLayout from "../components/DashboardLayout";
 import EmailVerification from "../pages/EmailVerification.jsx";
+import ValidateSession from "../components/ValidateSession.jsx";
 
 function Logout() {
   const navigate = useNavigate();
@@ -88,8 +89,22 @@ const AllRoutes = () => {
       />
       <Route path="/verify-email" element={<EmailVerification />} />
       <Route path="/logout" element={<Logout />} />
-      <Route path="/signin" element={<SignIn />} />
-      <Route path="/signup" element={<SignUp />} />
+      <Route
+        path="/signin"
+        element={
+          <ValidateSession>
+            <SignIn />
+          </ValidateSession>
+        }
+      />
+      <Route
+        path="/signup"
+        element={
+          <ValidateSession>
+            <SignUp />
+          </ValidateSession>
+        }
+      />
     </Routes>
   );
 };

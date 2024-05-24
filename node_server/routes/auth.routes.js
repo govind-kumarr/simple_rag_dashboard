@@ -1,5 +1,6 @@
 import { Router } from "express";
 import {
+  getAllSessions,
   getUserDetails,
   googleAuthCallback,
   loginController,
@@ -11,7 +12,7 @@ import {
   verifyEmail,
 } from "../controller/auth.controller.js";
 import { config } from "dotenv";
-import { verifySesssion } from '../middlewares/auth.middleware.js';
+import { verifySesssion } from "../middlewares/auth.middleware.js";
 
 config();
 
@@ -22,6 +23,8 @@ const CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET;
 const REDIRECT_URI = process.env.GOOGLE_REDIRECT_URI;
 const origin = process.env.ORIGIN;
 
+router.get("/sessions", verifySesssion, getAllSessions);
+
 router.get("/auth/google", (req, res) => {
   const url = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${CLIENT_ID}&redirect_uri=${REDIRECT_URI}&response_type=code&scope=profile email`;
   res.send(url);
@@ -30,7 +33,7 @@ router.get("/auth/google", (req, res) => {
 router.get("/auth/google/callback", googleAuthCallback);
 router.post("/auth/login", loginController);
 
-router.post("/logout", logoutController);
+router.post("/logout", verifySesssion, logoutController);
 
 // create route to get all the details of the user this is useful for checking is user verified email or not
 

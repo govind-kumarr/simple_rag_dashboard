@@ -22,9 +22,44 @@ const origin = process.env.ORIGIN;
 
 const lambdaClient = new Lambda_Client();
 
-export const createSession = async (user_id) => {
+export const getAllSessions = async (req, res) => {
+  try {
+    const userId = req.user.user;
+    const sessions = await SessionModel.find({ user: userId });
+    res.send(sessions);
+  } catch (error) {
+    console.log(error);
+    res.status(500).send("error occured");
+  }
+};
+
+const revokeSession = async (sid) => {
+  const session = await SessionModel.findOne({ sid });
+  if (!session) return;
+  session.is_revoked = true;
+  await session.save();
+};
+
+export const findActiveSessionsForUser = async (user) => {
+  const sessions = await SessionModel.find({ user, isRevoked: false });
+  return sessions;
+};
+
+export const removeOldSessions = async (user) => {
+  await SessionModel.updateMany({ user }, { isRevoked: false });
+};
+
+export const createSession = async (user_id, req, res) => {
   const sid = uuid();
-  await SessionModel.create({ sid, user: user_id });
+  await removeOldSessions(user_id);
+  await SessionModel.create({
+    sid,
+    user: user_id,
+    ip: req.ip,
+    browser: req.useragent.browser,
+    os: req.useragent.os,
+    platform: req.useragent.platform,
+  });
   const currentDate = new Date();
   const maxAge = COOKIE_AGE * 60 * 60 * 1000;
   const expires = new Date(currentDate.getTime() + maxAge);
@@ -39,7 +74,7 @@ export const loginController = async (req, res) => {
   const passwordMatch = isValidPassword(user, password);
 
   if (!passwordMatch) return res.json({ details: "Wrong password!" });
-  const { sid, expires, maxAge } = await createSession(user._id);
+  const { sid, expires, maxAge } = await createSession(user._id, req, res);
   res.cookie("sid", sid, {
     httpOnly: true,
     secure: NOD_ENV === "PROD",
@@ -51,15 +86,18 @@ export const loginController = async (req, res) => {
 };
 
 export const sendVerificationEmail = async (req, res) => {
-  try{
+  try {
     const email = req.body.email;
     const user = await UserModel.findOne({ email });
     if (!user)
-      return res.json({ message: "No user find with this email!", succes: false });
-  
-    
-    const {hashedToken, unHashToken, tokenExpiry} = UserModel.generateTemporaryToken();
-  
+      return res.json({
+        message: "No user find with this email!",
+        succes: false,
+      });
+
+    const { hashedToken, unHashToken, tokenExpiry } =
+      UserModel.generateTemporaryToken();
+
     user.email_verfication_token = hashedToken;
     user.email_verfication_expiry = tokenExpiry;
     await user.save();
@@ -67,48 +105,61 @@ export const sendVerificationEmail = async (req, res) => {
     await sendEmail({
       email: email,
       subject: "Email Verification",
-      text: verifyEmailTemplate(`${process.env.ORIGIN}/auth/verify-email/${user._id}/${unHashToken}`),
+      text: verifyEmailTemplate(
+        `${process.env.ORIGIN}/auth/verify-email/${user._id}/${unHashToken}`
+      ),
     });
-    
+
     res.json({ message: "Verification Email Sent!", success: true });
-  }
-  catch(err){
-    console.log(err)
-    return res.status(500).json({message: "Something went wrong", success: false});
+  } catch (err) {
+    console.log(err);
+    return res
+      .status(500)
+      .json({ message: "Something went wrong", success: false });
   }
 };
 
 export const verifyEmail = async (req, res) => {
-  try{
+  try {
     const { userId, verificationToken } = req.params;
     const user = await UserModel.findById(userId);
-  
-    if (!user) return res.status(400).json({ message: "No user found!", success: false });
+
+    if (!user)
+      return res
+        .status(400)
+        .json({ message: "No user found!", success: false });
 
     const hashedToken = crypto
-                          .createHash('sha256')
-                          .update(verificationToken)
-                          .digest('hex');
-    
-  
-    if((hashedToken !== user.email_verfication_token) || (Date.now() > user.email_verfication_expiry)){
-      return res.status(401).json({ message: "Credentials invalid", success: false });
+      .createHash("sha256")
+      .update(verificationToken)
+      .digest("hex");
+
+    if (
+      hashedToken !== user.email_verfication_token ||
+      Date.now() > user.email_verfication_expiry
+    ) {
+      return res
+        .status(401)
+        .json({ message: "Credentials invalid", success: false });
     }
-  
+
     user.email_verified = true;
     user.email_verfication_expiry = undefined;
     user.email_verfication_token = undefined;
     await user.save();
-  
-    return res.status(200).json({message: "Email verified", success: true});
-  }
-  catch(err){
+
+    return res.status(200).json({ message: "Email verified", success: true });
+  } catch (err) {
     console.log(err);
-    return res.status(500).json({messages: "Something went wrong", success: false})
+    return res
+      .status(500)
+      .json({ messages: "Something went wrong", success: false });
   }
 };
 
 export const logoutController = async (req, res) => {
+  const { sid } = req.user;
+  await revokeSession(sid);
   res.clearCookie("sid");
   res.send({
     details: "Logout Success!",
@@ -260,7 +311,7 @@ export const googleAuthCallback = async (req, res) => {
     );
     const { message, success, user } = await handleGoogleUser(profile);
     if (success) {
-      const { sid, expires, maxAge } = await createSession(user._id);
+      const { sid, expires, maxAge } = await createSession(user._id,req,res);
       console.log("Session Created!", { sid, expires, maxAge });
       return res
         .cookie("sid", sid, {
