@@ -14,6 +14,7 @@ import ProtectedRoute from "../components/ProtectedRoute";
 import DashboardLayout from "../components/DashboardLayout";
 import EmailVerification from "../pages/EmailVerification.jsx";
 import ValidateSession from "../components/ValidateSession.jsx";
+import TrainAi from "../pages/TrainAi.jsx";
 
 function Logout() {
   const navigate = useNavigate();
@@ -82,7 +83,7 @@ const AllRoutes = () => {
         element={
           <ProtectedRoute>
             <DashboardLayout>
-              <h1>Add instructions</h1>
+              <TrainAi />
             </DashboardLayout>
           </ProtectedRoute>
         }
