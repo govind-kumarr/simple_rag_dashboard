@@ -10,6 +10,7 @@ import { sendEmail } from "../utils/sendEmail/index.js";
 import { verifyEmailTemplate } from "../utils/sendEmail/Templates/verifyEmailTemplate.js";
 import { Lambda_Client } from "./lambda-client.js";
 import { generateRandomString } from "../utils/utils.js";
+import { forgetPasswordTemplate } from "../utils/sendEmail/Templates/forgetPasswordTemplate.js";
 
 config();
 
@@ -448,7 +449,7 @@ export const forgetPassword = async(req, res) => {
     await sendEmail({
       email: email,
       subject: "Reset Password",
-      text: verifyEmailTemplate(
+      text: forgetPasswordTemplate(
         `${process.env.ORIGIN}/auth/reset-password/${user._id}/${unHashToken}`
       ),
     });
