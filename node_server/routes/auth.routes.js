@@ -1,11 +1,14 @@
 import { Router } from "express";
 import {
+  forgetPassword,
   getAllSessions,
   getUserDetails,
   googleAuthCallback,
   loginController,
   logoutController,
   registerController,
+  resetPassword,
+  resetPasswordVerify,
   sendVerificationEmail,
   updateUserInfo,
   updateUserPassword,
@@ -32,6 +35,11 @@ router.get("/auth/google", (req, res) => {
 
 router.get("/auth/google/callback", googleAuthCallback);
 router.post("/auth/login", loginController);
+
+//router for forget passwords
+router.post("/auth/forget-password", forgetPassword);
+router.post("/auth/reset-password-verification", resetPasswordVerify);
+router.post("/auth/reset-password", resetPassword)
 
 router.post("/logout", verifySesssion, logoutController);
 

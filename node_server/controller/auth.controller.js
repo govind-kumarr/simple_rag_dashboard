@@ -427,3 +427,105 @@ export const updateUserPassword = async (req, res) => {
     });
   }
 };
+
+export const forgetPassword = async(req, res) => {
+  try {
+    const email = req.body.email;
+    const user = await UserModel.findOne({ email });
+    if (!user)
+      return res.json({
+        message: "No user find with this email!",
+        success: false,
+      });
+
+    const { hashedToken, unHashToken, tokenExpiry } =
+      UserModel.generateTemporaryToken();
+
+    user.forget_password_token = hashedToken;
+    user.forget_password_expiry = tokenExpiry;
+    await user.save();
+
+    await sendEmail({
+      email: email,
+      subject: "Reset Password",
+      text: verifyEmailTemplate(
+        `${process.env.ORIGIN}/auth/reset-password/${user._id}/${unHashToken}`
+      ),
+    });
+
+    res.json({ message: "Reset Password link Sent on your Email!", success: true });
+  }
+  catch(eror){
+    res.status(500).json({message: "something went wrong", success: false});
+  }
+}
+
+export const resetPasswordVerify = async(req, res)=>{
+  try{
+    const { userId, verificationToken } = req.body;
+    const user = await UserModel.findById(userId);
+
+    if (!user)
+      return res
+        .status(400)
+        .json({ message: "No user found!", success: false });
+
+    const hashedToken = crypto
+      .createHash("sha256")
+      .update(verificationToken)
+      .digest("hex");
+
+    if (
+      hashedToken !== user.forget_password_token ||
+      Date.now() > user.forget_password_expiry
+    ) {
+      return res
+        .status(401)
+        .json({ message: "Credentials invalid", success: false });
+    }
+
+    return res.status(200).json({ message: "Credentails are valid", success: true });
+  }
+  catch(err){
+    console.error("reset password verification falied !!! ",err);
+    res.status(500).json({message: "something went wrong", success: false});
+  }
+}
+
+export const resetPassword = async(req, res)=>{
+  try{
+    const {userId,verificationToken, newPassword} = req.body;
+    const user = await UserModel.findById(userId);
+
+    if (!user){
+      return res
+        .status(400)
+        .json({ message: "No user found!", success: false });
+    }
+    const hashedToken = crypto
+    .createHash("sha256")
+    .update(verificationToken)
+    .digest("hex");
+
+    if (
+      hashedToken !== user.forget_password_token ||
+      Date.now() > user.forget_password_expiry
+    ) {
+      return res
+        .status(401)
+        .json({ message: "Credentials invalid", success: false });
+    }
+    const hash = createHash(newPassword);
+
+    user.password = hash;
+    user.forget_password_token = undefined;
+    user.forget_password_expiry = undefined;
+    await user.save();
+    res.status(200).json({message: "Password successfully changed", success: true});
+  }
+  catch(err){
+    console.error("reset password falied !!! ",err);
+    res.status(500).json({message: "something went wrong", success: false});
+
+  }
+}
