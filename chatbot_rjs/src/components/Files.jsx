@@ -4,7 +4,9 @@ import { FailTag, SuccessTag } from "./Tags";
 import { instance } from "../config/axios_config";
 
 const File_Row = ({ file, selectAll, handleFileDelete }) => {
-  const { fileName, uploadDate, uploadStatus, type } = file;
+  const { fileName, uploadDate, uploadStatus, type, fileKey } = file;
+  const fileTagDetails = fileKey.split(".");
+  const fileTag = fileTagDetails[fileTagDetails.length - 1];
   const [checked, setChecked] = useState(false);
   return (
     <tr className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
@@ -28,7 +30,7 @@ const File_Row = ({ file, selectAll, handleFileDelete }) => {
       >
         {fileName}
       </th>
-      <td className="px-6 py-4">{type}</td>
+      <td className="px-6 py-4">{fileTag}</td>
       <td className="px-6 py-4">{moment(new Date(uploadDate)).fromNow()}</td>
       <td className="px-6 py-4">
         {uploadStatus ? (

@@ -18,7 +18,9 @@ const Sidebar = () => {
           details: { memoryConsumed, totalLimit },
         } = data;
         const percentConsumed = (memoryConsumed / totalLimit) * 100;
-        setPercentConsumed(Math.ceil(percentConsumed));
+        setPercentConsumed(
+          Math.ceil(percentConsumed) > 100 ? 100 : Math.ceil(percentConsumed)
+        );
       }
     } catch (error) {
       console.error("Error fetching memory info:", error);
