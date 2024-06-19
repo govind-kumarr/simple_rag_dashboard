@@ -38,6 +38,12 @@ const UserSchema = mongoose.Schema(
     email_verfication_expiry: {
       type: Date,
     },
+    forget_password_token: {
+      type: String
+    },
+    forget_password_expiry: {
+      type: Date
+    }
   },
   { timestamps: true }
 );
