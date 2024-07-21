@@ -1,21 +1,23 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Document</title>
-    <!-- <link rel="stylesheet" href="./style.css"> -->
-    <script
-      src="https://kit.fontawesome.com/dc62d44e03.js"
-      crossorigin="anonymous"
-    ></script>
-  </head>
-
-  <body></body>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Chatbot</title>
+  <!-- <link rel="stylesheet" href="./style.css"> -->
+  <script src="https://kit.fontawesome.com/dc62d44e03.js" crossorigin="anonymous"></script>
+</head>
+<body>
+</body>
 </html>
 
 <script type="module">
-  import { initializeChat } from "./index.js";
-  let origin = window.location.origin;
-  initializeChat(origin);
+  import { attachChatBotToBody } from "./index.js";
+
+  // Initialize the chatbot
+  document.addEventListener("DOMContentLoaded", () => {
+    const { chatbotContainer, openButton } = attachChatBotToBody();
+    document.body.appendChild(chatbotContainer);
+    document.body.appendChild(openButton);
+  });
 </script>

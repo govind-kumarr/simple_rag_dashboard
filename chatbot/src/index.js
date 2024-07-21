@@ -1,29 +1,19 @@
 import { attachChatBotToBody } from "./Chatbot.js";
+
 function afterChatInitialized() {
   const chatContainer = document.querySelector(".chatbot_container_1b9d6bcd");
   const chatBody = document.querySelector(".chatbot_body_1b9d6bcd");
-  const closeButton = document.querySelector(
-    ".chatbot_header_right_1b9d6bcd span"
-  );
+  const closeButton = document.querySelector(".chatbot_header_right_1b9d6bcd span");
+  const chatbotOpenButton = document.querySelector(".chatbot_open_button_1b9d6bcd span");
 
-  const sendButton = document.querySelector("#send_button_1b9d6bcd");
-  // Input box
-  const inputBox = document.querySelector("#chatbot_footer_input_box_1b9d6bcd");
-
-  sendButton?.addEventListener("click", submitUserMessage);
-  inputBox?.addEventListener("keydown", function (event) {
-    if (event.key === "Enter") {
-      submitUserMessage();
-    }
-  });
-
+  // Function to add AI response
   function addAIResponse(message) {
     const messageBox = chatBody.lastChild;
     const ai_message = messageBox.querySelector(".ai_message p");
     ai_message.textContent = message;
   }
 
-  // function to scroll to the bottom
+  // Function to scroll to the bottom
   function scrollToLastMessage() {
     chatBody.scrollTop = chatBody.scrollHeight;
   }
@@ -36,20 +26,16 @@ function afterChatInitialized() {
     addUserMessage(message);
     scrollToLastMessage();
     inputBox.value = "";
-    // Here will make the API request to AIAAS
     const clearTypingEffect = addAIMessage("");
     scrollToLastMessage();
     await new Promise((res) => {
       setTimeout(() => {
         res();
         clearTypingEffect();
-        addAIResponse(
-          "Thanks for submitting your question! We'll reach out to you soon!"
-        );
+        addAIResponse("Thanks for submitting your question! We'll reach out to you soon!");
         scrollToLastMessage();
       }, 5000);
     });
-    // addAIMessage("Thanks for submitting your question! We'll reach out to you soon!")
   }
 
   // Function to add AI message
@@ -92,14 +78,14 @@ function afterChatInitialized() {
         dots = "";
       }
       element.textContent = "Emily Typing" + dots;
-    }, 200); // Adjust the interval as needed
+    }, 200);
 
     return function () {
       clearInterval(interval);
     };
   }
 
-  // Function to add that message to UI
+  // Function to add user message to UI
   function addUserMessage(messageText) {
     const messageBox = document.createElement("div");
     messageBox.classList.add("message_box_1b9d6bcd");
@@ -121,6 +107,7 @@ function afterChatInitialized() {
     chatBody.appendChild(messageBox);
   }
 
+  // Function to add chatbot footer
   function addChatBotFooter() {
     if (isElementPresent(".chatbot_footer_1b9d6bcd")) return;
 
@@ -134,7 +121,7 @@ function afterChatInitialized() {
     inputBox.id = "chatbot_footer_input_box_1b9d6bcd";
     inputBox.type = "text";
     inputBox.placeholder = "Enter message...";
-    inputBox?.addEventListener("keydown", function (event) {
+    inputBox.addEventListener("keydown", function (event) {
       if (event.key === "Enter") {
         submitUserMessage(inputBox);
       }
@@ -147,13 +134,12 @@ function afterChatInitialized() {
 
     const sendButton = document.createElement("span");
     sendButton.id = "send_button_1b9d6bcd";
-    sendButton?.addEventListener("click", () => submitUserMessage(inputBox));
+    sendButton.addEventListener("click", () => submitUserMessage(inputBox));
 
     const icon = document.createElement("i");
     icon.classList.add("fa-solid", "fa-paper-plane");
 
     sendButton.appendChild(icon);
-
     sendDiv.appendChild(sendButton);
 
     chatbotFooter.appendChild(inputDiv);
@@ -162,18 +148,20 @@ function afterChatInitialized() {
     chatContainer.appendChild(chatbotFooter);
   }
 
+  // Function to save user info
   function saveUserInfo(userInfo) {
     localStorage.setItem("userInfo", JSON.stringify(userInfo));
   }
 
+  // Function to remove rating container
   function removeRatingContainer() {
     const elem = isElementPresent(".chatbot_rating_container_1b9d6bcd");
     if (elem) elem.remove();
   }
-  // Rating logic
+
+  // Function to handle star rating events
   function addRatingContainerEvents() {
     const stars = document.querySelectorAll(".rating_star_1b9d6bcd");
-    console.log(stars);
     let rating = 0; // Variable to store the user's rating
 
     // Function to handle star hover
@@ -195,7 +183,6 @@ function afterChatInitialized() {
     // Function to handle form submission
     function handleSubmit(event) {
       event.preventDefault();
-      // Add your submission logic here
       console.log("Rating submitted:", rating);
       let userInfo = getUserInfo();
       userInfo = { ...userInfo, rating };
@@ -203,7 +190,7 @@ function afterChatInitialized() {
       removeRatingContainer();
       addChatBotFooter();
       addAIMessage()();
-      addAIResponse("Hi, How can i help you ?");
+      addAIResponse("Hi, How can I help you?");
     }
 
     // Add event listeners to stars
@@ -219,12 +206,11 @@ function afterChatInitialized() {
     });
 
     // Add event listener to form submit button
-    const submitButton = document.querySelector(
-      ".chatbot_rating_submit_1b9d6bcd button"
-    );
+    const submitButton = document.querySelector(".chatbot_rating_submit_1b9d6bcd button");
     submitButton.addEventListener("click", handleSubmit);
   }
 
+  // Function to attach rating container
   function attachRatingContainer() {
     const form = document.createElement("form");
     form.classList.add("chatbot_rating_container_1b9d6bcd");
@@ -242,15 +228,12 @@ function afterChatInitialized() {
       form.remove();
     });
 
-    // Create the h2 element for the heading
     const heading = document.createElement("h2");
-    heading.textContent = "Rate us : ";
+    heading.textContent = "Rate us:";
 
-    // Create the div element for the rating stars container with the class "rating_stars_container_1b9d6bcd"
     const starsContainer = document.createElement("div");
     starsContainer.classList.add("rating_stars_container_1b9d6bcd");
 
-    // Create 5 span elements with the class "rating_star_1b9d6bcd", each containing a star icon
     for (let i = 0; i < 5; i++) {
       const starSpan = document.createElement("span");
       starSpan.classList.add("rating_star_1b9d6bcd");
@@ -262,66 +245,55 @@ function afterChatInitialized() {
       starsContainer.appendChild(starSpan);
     }
 
-    // Create the div element for the submit button container with the class "chatbot_rating_submit_1b9d6bcd"
     const submitContainer = document.createElement("div");
     submitContainer.classList.add("chatbot_rating_submit_1b9d6bcd");
 
-    // Create the submit button element
     const submitButton = document.createElement("button");
     submitButton.type = "submit";
     submitButton.textContent = "Submit";
 
-    // Append all elements to the form
     form.appendChild(heading);
     form.appendChild(starsContainer);
     submitContainer.appendChild(submitButton);
     form.appendChild(submitContainer);
 
-    // Append the form to the document body or any other desired parent element
     chatBody.appendChild(form);
 
     addRatingContainerEvents();
   }
 
-  // Customer Registration form
+  // Function to attach customer registration form
   function attachCustomerRegistrationForm() {
-    // Create the form element with the class "customer_register_form_1b9d6bcd"
     const form = document.createElement("form");
     form.classList.add("customer_register_form_1b9d6bcd");
 
-    // Create the email input element with the class "cust_regist_email_1b9d6bcd" and placeholder "Email"
     const emailInput = document.createElement("input");
     emailInput.type = "email";
     emailInput.classList.add("cust_regist_email_1b9d6bcd");
     emailInput.placeholder = "Email";
     emailInput.required = true;
 
-    // Create the name input element with the class "cust_regist_name_1b9d6bcd" and placeholder "Name"
     const nameInput = document.createElement("input");
     nameInput.type = "text";
     nameInput.classList.add("cust_regist_name_1b9d6bcd");
     nameInput.placeholder = "Name";
     nameInput.required = true;
 
-    // Create the submit button element with the id "cust_regist_submit_1b9d6bcd" and text content "submit"
     const submitButton = document.createElement("button");
     submitButton.id = "cust_regist_submit_1b9d6bcd";
     submitButton.type = "submit";
-    submitButton.textContent = "submit";
+    submitButton.textContent = "Submit";
 
-    // Append the input elements and the button to the form
     form.appendChild(emailInput);
     form.appendChild(nameInput);
     form.appendChild(submitButton);
 
-    // Append the form to the document body or any other desired parent element
     chatBody.appendChild(form);
   }
 
+  // Function to add customer registration events
   function addCustomerRegEvents() {
-    const customer_register_form = document.querySelector(
-      ".customer_register_form_1b9d6bcd"
-    );
+    const customer_register_form = document.querySelector(".customer_register_form_1b9d6bcd");
 
     function addCustomerRegistration(e) {
       e.preventDefault();
@@ -341,12 +313,8 @@ function afterChatInitialized() {
     }
 
     function validateCustRegForm() {
-      const emailInput = customer_register_form.querySelector(
-        ".cust_regist_email_1b9d6bcd"
-      );
-      const nameInput = customer_register_form.querySelector(
-        ".cust_regist_name_1b9d6bcd"
-      );
+      const emailInput = customer_register_form.querySelector(".cust_regist_email_1b9d6bcd");
+      const nameInput = customer_register_form.querySelector(".cust_regist_name_1b9d6bcd");
 
       const { value: email } = emailInput;
       const { value: name } = nameInput;
@@ -359,13 +327,15 @@ function afterChatInitialized() {
       return { email, name };
     }
 
-    customer_register_form?.addEventListener("submit", addCustomerRegistration);
+    customer_register_form.addEventListener("submit", addCustomerRegistration);
   }
 
+  // Function to get user info from localStorage
   function getUserInfo() {
     return JSON.parse(localStorage.getItem("userInfo"));
   }
 
+  // Function to check if user is registered
   function checkIfRegistered() {
     const userInfo = getUserInfo();
     if (!userInfo && !isElementPresent(".customer_register_form_1b9d6bcd")) {
@@ -378,7 +348,7 @@ function afterChatInitialized() {
     }
   }
 
-  // checkIfRegistered()
+  // Handle close button click
   closeButton.addEventListener("click", () => {
     if (!isElementPresent(".chatbot_rating_container_1b9d6bcd")) {
       chatBody.innerHTML = "";
@@ -389,13 +359,12 @@ function afterChatInitialized() {
     }
   });
 
+  // Check if an element is present
   function isElementPresent(selector) {
     return chatContainer.querySelector(selector);
   }
 
-  const chatbotOpenButton = document.querySelector(
-    ".chatbot_open_button_1b9d6bcd span"
-  );
+  // Handle chatbot open button click
   chatbotOpenButton.addEventListener("click", openChatBot);
 
   function removeChatBotOpenButton() {
@@ -406,35 +375,36 @@ function afterChatInitialized() {
     chatbotOpenButton.classList.remove("hidden");
   }
 
+  // Function to open chatbot
   function openChatBot() {
     const isChatBotPresent = isElementPresent(".chatbot_container_1b9d6bcd");
     if (!isChatBotPresent) {
       removeChatBotOpenButton();
       const chatBot = document.querySelector(".chatbot_container_1b9d6bcd");
       const isChatbotHidden = chatBot.classList.contains("hidden");
-      isChatbotHidden ? chatBot.classList.remove("hidden") : null;
+      if (isChatbotHidden) chatBot.classList.remove("hidden");
       checkIfRegistered();
-      // addWelcomeMessage()
     }
   }
 
+  // Function to add welcome message
   function addWelcomeMessage() {
     addAIMessage()();
-    addAIResponse("Hi Sir, How can I help you");
+    addAIResponse("Hi Sir, How can I help you?");
     addChatBotFooter();
   }
 
+  // Function to close chatbot
   function closeChatBot() {
     console.log("close chat bot");
     chatContainer.classList.add("hidden");
   }
 }
 
-export function initializeChat(baseUrl){
-  console.log({baseUrl})
+export function initializeChat(baseUrl) {
+  console.log({ baseUrl });
   const { chatbotContainer, openButton } = attachChatBotToBody();
   document.body.appendChild(chatbotContainer);
   document.body.appendChild(openButton);
   afterChatInitialized();
 }
-
