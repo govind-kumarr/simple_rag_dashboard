@@ -73,7 +73,9 @@ export const loginController = async (req, res) => {
 
   const passwordMatch = isValidPassword(user, password);
 
-  if (!passwordMatch) return res. status(401).json({ details: "Wrong password!" });
+  if (!passwordMatch){
+    return res. status(401).json({ details: "Wrong password!" });
+  }
   const { sid, expires, maxAge } = await createSession(user._id, req, res);
   res.cookie("sid", sid, {
     httpOnly: true,
